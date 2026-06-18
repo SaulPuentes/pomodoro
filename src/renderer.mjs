@@ -8,7 +8,7 @@ let state = timer.initState(settings);
 let tickHandle = null;
 
 const $ = (id) => document.getElementById(id);
-const PHASE_LABEL = { work: 'Work', short: 'Short Break', long: 'Long Break' };
+const PHASE_LABEL = { work: 'Concentration', short: 'Short Break', long: 'Long Break' };
 
 function fmt(ms) {
   const total = Math.ceil(ms / 1000);
