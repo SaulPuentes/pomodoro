@@ -88,4 +88,58 @@ $('skip').addEventListener('click', () => {
   render();
 });
 
+function clampInt(value, fallback) {
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+function loadSettingsUI() {
+  $('workMin').value = settings.workMin;
+  $('shortMin').value = settings.shortMin;
+  $('longMin').value = settings.longMin;
+  $('soundEnabled').checked = settings.soundEnabled;
+}
+
+function onSettingsChange() {
+  settings = {
+    workMin: clampInt($('workMin').value, settings.workMin),
+    shortMin: clampInt($('shortMin').value, settings.shortMin),
+    longMin: clampInt($('longMin').value, settings.longMin),
+    soundEnabled: $('soundEnabled').checked,
+  };
+  storage.saveSettings(store, settings);
+  loadSettingsUI(); // reflect any clamped values
+  if (!state.running) {
+    state = { ...state, remainingMs: timer.durationMsFor(state.phase, settings) };
+  }
+  render();
+}
+
+function renderHistory() {
+  const history = storage.loadHistory(store);
+  const list = $('history');
+  list.innerHTML = '';
+  Object.keys(history)
+    .sort()
+    .reverse()
+    .forEach((date) => {
+      const li = document.createElement('li');
+      li.textContent = `${date}: ${history[date]}`;
+      list.appendChild(li);
+    });
+}
+
+['workMin', 'shortMin', 'longMin', 'soundEnabled'].forEach((id) => {
+  $(id).addEventListener('change', onSettingsChange);
+});
+
+// Re-render history whenever a session completes.
+const _onComplete = onComplete;
+onComplete = function () {
+  _onComplete();
+  renderHistory();
+};
+
+loadSettingsUI();
+renderHistory();
 render();
