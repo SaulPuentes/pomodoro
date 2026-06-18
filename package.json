@@ -1,0 +1,13 @@
+{
+  "name": "pomodoro",
+  "version": "1.0.0",
+  "description": "Desktop Pomodoro timer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}
