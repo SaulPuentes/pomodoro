@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'"
+    />
+    <title>Pomodoro</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <div id="phase" class="phase">Concentration</div>
+      <div id="time" class="time">25:00</div>
+      <div id="dots" class="dots"></div>
+
+      <div class="controls">
+        <button id="startPause">Start</button>
+        <button id="reset">Reset</button>
+        <button id="skip">Skip</button>
+      </div>
+
+      <div class="today">Today: <span id="count">0</span></div>
+
+      <details class="panel">
+        <summary>Settings</summary>
+        <label>Concentration (min) <input id="workMin" type="number" min="1" /></label>
+        <label>Short break (min) <input id="shortMin" type="number" min="1" /></label>
+        <label>Long break (min) <input id="longMin" type="number" min="1" /></label>
+        <label>Sound <input id="soundEnabled" type="checkbox" /></label>
+      </details>
+
+      <details class="panel">
+        <summary>History</summary>
+        <ul id="history"></ul>
+      </details>
+    </main>
+    <script type="module" src="renderer.mjs"></script>
+  </body>
+</html>
