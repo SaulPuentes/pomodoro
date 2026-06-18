@@ -57,3 +57,33 @@ test('reset returns to fresh work state', () => {
   s = timer.reset(s, settings);
   assert.deepEqual(s, timer.initState(settings));
 });
+
+test('start sets target end to now + remaining', () => {
+  const s = timer.start(timer.initState(settings), 1000);
+  assert.equal(s.running, true);
+  assert.equal(s.targetEndMs, 1000 + 25 * 60000);
+});
+
+test('remainingAt counts down while running', () => {
+  const s = timer.start(timer.initState(settings), 1000);
+  assert.equal(timer.remainingAt(s, 1000 + 60000), 25 * 60000 - 60000);
+});
+
+test('remainingAt never goes negative', () => {
+  const s = timer.start(timer.initState(settings), 1000);
+  assert.equal(timer.remainingAt(s, 1000 + 999 * 60000), 0);
+});
+
+test('pause freezes remaining and ignores later time', () => {
+  let s = timer.start(timer.initState(settings), 1000);
+  s = timer.pause(s, 1000 + 60000);
+  assert.equal(s.running, false);
+  assert.equal(s.remainingMs, 25 * 60000 - 60000);
+  assert.equal(s.targetEndMs, null);
+  assert.equal(timer.remainingAt(s, 9_999_999), 25 * 60000 - 60000);
+});
+
+test('remainingAt while paused returns stored remaining', () => {
+  const s = timer.initState(settings);
+  assert.equal(timer.remainingAt(s, 123456), 25 * 60000);
+});

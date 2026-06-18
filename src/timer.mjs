@@ -50,3 +50,19 @@ export function skip(state, settings) {
 export function reset(state, settings) {
   return initState(settings);
 }
+
+export function start(state, now) {
+  if (state.running) return state;
+  return { ...state, running: true, targetEndMs: now + state.remainingMs };
+}
+
+export function pause(state, now) {
+  if (!state.running) return state;
+  const remainingMs = Math.max(0, state.targetEndMs - now);
+  return { ...state, running: false, remainingMs, targetEndMs: null };
+}
+
+export function remainingAt(state, now) {
+  if (state.running) return Math.max(0, state.targetEndMs - now);
+  return state.remainingMs;
+}
