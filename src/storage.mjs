@@ -1,5 +1,7 @@
 const SETTINGS_KEY = 'pomodoro.settings';
 const HISTORY_KEY = 'pomodoro.history';
+const BACKGROUND_KEY = 'pomodoro.background';
+const UNSPLASH_KEY = 'pomodoro.unsplashKey';
 const MAX_DAYS = 30;
 
 export const DEFAULT_SETTINGS = {
@@ -47,6 +49,23 @@ function trim(history) {
 
 export function getCount(store, key) {
   return loadHistory(store)[key] || 0;
+}
+
+export function loadBackground(store) {
+  return readJSON(store, BACKGROUND_KEY, null);
+}
+
+export function saveBackground(store, bg) {
+  store.setItem(BACKGROUND_KEY, JSON.stringify(bg));
+}
+
+export function loadUnsplashKey(store) {
+  const raw = store.getItem(UNSPLASH_KEY);
+  return typeof raw === 'string' ? raw : '';
+}
+
+export function saveUnsplashKey(store, key) {
+  store.setItem(UNSPLASH_KEY, key || '');
 }
 
 export function incrementToday(store, now = new Date()) {

@@ -4,38 +4,88 @@
     <meta charset="utf-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self'"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.unsplash.com https://plus.unsplash.com; connect-src 'self' https://api.unsplash.com"
     />
     <title>Pomodoro</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main>
-      <div id="phase" class="phase">Concentration</div>
-      <div id="time" class="time">25:00</div>
-      <div id="dots" class="dots"></div>
+    <div class="bg" id="bg" aria-hidden="true"></div>
+    <div class="scrim" aria-hidden="true"></div>
 
-      <div class="controls">
-        <button id="startPause">Start</button>
-        <button id="reset">Reset</button>
-        <button id="skip">Skip</button>
+    <div class="frame">
+      <main class="stage">
+        <p class="phase"><span id="phase">in focus</span></p>
+
+        <section class="pane">
+          <div id="time" class="time">25:00</div>
+          <div id="dots" class="dots" aria-hidden="true"></div>
+          <div class="horizon"><span id="horizonFill" class="horizon-fill"></span></div>
+        </section>
+
+        <div class="controls">
+          <button id="startPause" class="btn btn-primary">Start</button>
+          <button id="reset" class="btn">Reset</button>
+          <button id="skip" class="btn">Skip</button>
+        </div>
+
+        <p class="today">
+          <em>today</em><span id="count" class="today-count">0</span>
+          <span class="today-unit">focus blocks</span>
+        </p>
+      </main>
+
+      <nav class="dock">
+        <button id="dockView" class="dock-btn dock-view" data-drawer="view">
+          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" /><circle cx="8.5" cy="10" r="1.7" /><path d="M3.5 17l5-4 3 2 4-4 5 4.5" /></svg>
+          Change the view
+        </button>
+        <button class="dock-btn icon" data-drawer="settings" aria-label="Settings" title="Settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" /><path d="M19.4 13a7.8 7.8 0 0 0 0-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7.6 7.6 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7.8 7.8 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.6 7.6 0 0 0 1.7-1l2.3 1 2-3.4z" /></svg>
+        </button>
+        <button class="dock-btn icon" data-drawer="history" aria-label="History" title="History">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></svg>
+        </button>
+      </nav>
+    </div>
+
+    <div id="backdrop" class="backdrop" hidden></div>
+
+    <aside id="drawer-view" class="drawer" hidden>
+      <header class="drawer-head">
+        <h2>Pick a view</h2>
+        <button class="link" data-close>Done</button>
+      </header>
+      <div id="filmstrip" class="filmstrip"></div>
+      <div class="drawer-actions">
+        <button id="shuffle" class="btn">Shuffle</button>
+        <button id="fetchUnsplash" class="btn" hidden>New from Unsplash</button>
       </div>
+      <p id="bgCredit" class="credit"></p>
+    </aside>
 
-      <div class="today">Today: <span id="count">0</span></div>
+    <aside id="drawer-settings" class="drawer" hidden>
+      <header class="drawer-head">
+        <h2>Settings</h2>
+        <button class="link" data-close>Done</button>
+      </header>
+      <label class="field"><span>Focus minutes</span><input id="workMin" type="number" min="1" /></label>
+      <label class="field"><span>Short break</span><input id="shortMin" type="number" min="1" /></label>
+      <label class="field"><span>Long break</span><input id="longMin" type="number" min="1" /></label>
+      <label class="check"><input id="soundEnabled" type="checkbox" /><span>Chime when a session ends</span></label>
+      <hr class="rule" />
+      <label class="field"><span>Unsplash access key</span><input id="unsplashKey" type="password" placeholder="optional" autocomplete="off" /></label>
+      <p class="hint">Add your own key to pull fresh nature photos. Get one free at unsplash.com/developers.</p>
+    </aside>
 
-      <details class="panel">
-        <summary>Settings</summary>
-        <label>Concentration (min) <input id="workMin" type="number" min="1" /></label>
-        <label>Short break (min) <input id="shortMin" type="number" min="1" /></label>
-        <label>Long break (min) <input id="longMin" type="number" min="1" /></label>
-        <label>Sound <input id="soundEnabled" type="checkbox" /></label>
-      </details>
+    <aside id="drawer-history" class="drawer" hidden>
+      <header class="drawer-head">
+        <h2>History</h2>
+        <button class="link" data-close>Done</button>
+      </header>
+      <ul id="history" class="history"></ul>
+    </aside>
 
-      <details class="panel">
-        <summary>History</summary>
-        <ul id="history"></ul>
-      </details>
-    </main>
     <script type="module" src="renderer.mjs"></script>
   </body>
 </html>

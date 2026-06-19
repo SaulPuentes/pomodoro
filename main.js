@@ -5,9 +5,10 @@ let win = null;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 360,
-    height: 520,
+    width: 384,
+    height: 660,
     resizable: false,
+    backgroundColor: '#0c1410',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

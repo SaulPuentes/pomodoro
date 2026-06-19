@@ -17,6 +17,11 @@ to the front the moment a session ends.
 - **Manual transitions** — every phase waits for you to start it; no surprise
   countdowns.
 - **Optional sound** — a completion beep you can toggle on (off by default).
+- **Nature backdrops** — a frosted-glass timer floats over a full-bleed nature
+  photo. Pick from a curated set of Unsplash views, shuffle, or add your own
+  Unsplash access key in Settings to pull fresh photos. A luminous horizon line
+  sweeps across the glass as the phase elapses — amber while focusing, aqua while
+  resting.
 
 ## Requirements
 
@@ -47,12 +52,18 @@ manually.
 - `preload.js` — minimal, isolated IPC bridge (`contextIsolation` on).
 - `src/timer.mjs` — pure state machine: phases, the long-break-after-4 cycle,
   and a timestamp-based countdown that stays accurate through sleep.
-- `src/storage.mjs` — `localStorage` wrapper for settings and the daily history.
+- `src/storage.mjs` — `localStorage` wrapper for settings, daily history, the
+  chosen background, and the optional Unsplash key.
+- `src/backgrounds.mjs` — the curated view list, Unsplash CDN URL helpers, and
+  the live "random nature" fetch.
 - `src/renderer.mjs` — wires the pure modules to the DOM.
 - `src/sound.mjs` — WebAudio completion beep.
+- `src/fonts/` — bundled Bricolage Grotesque and Newsreader woff2 (so type works
+  offline under the strict CSP).
 
-Settings and history persist in `localStorage`. No accounts, no network, no
-database.
+Settings, history, and your chosen view persist in `localStorage`. No accounts,
+no database. Photos are hot-linked from the Unsplash CDN per their guidelines —
+the only network calls — so backgrounds need an internet connection.
 
 ## License
 
