@@ -5,9 +5,26 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "node --test test/"
+    "test": "node --test test/",
+    "icon": "bash scripts/make-icon.sh",
+    "dist": "electron-builder --arm64"
+  },
+  "build": {
+    "appId": "com.saulpuentes.pomodoro",
+    "productName": "Pomodoro",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*"
+    ],
+    "mac": {
+      "icon": "build/icon.icns",
+      "category": "public.app-category.productivity",
+      "target": "dir"
+    }
   },
   "devDependencies": {
-    "electron": "^31.0.0"
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
   }
 }
