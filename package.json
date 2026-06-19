@@ -7,7 +7,7 @@
     "start": "electron .",
     "test": "node --test test/",
     "icon": "bash scripts/make-icon.sh",
-    "dist": "electron-builder --arm64"
+    "dist": "electron-builder"
   },
   "build": {
     "appId": "com.saulpuentes.pomodoro",
@@ -20,11 +20,17 @@
     "mac": {
       "icon": "build/icon.icns",
       "category": "public.app-category.productivity",
-      "target": "dir"
+      "identity": null,
+      "target": [
+        {
+          "target": "dir",
+          "arch": "arm64"
+        }
+      ]
     }
   },
   "devDependencies": {
     "electron": "^31.0.0",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "24.13.3"
   }
 }

@@ -297,10 +297,10 @@ npm run icon   # render build/icon.icns from build/icon.svg (run once, or after 
 npm run dist   # package into dist/mac-arm64/Pomodoro.app
 ```
 
-Then drag `dist/mac-arm64/Pomodoro.app` into `/Applications`. The build is
-ad-hoc signed and self-built, so macOS launches it without a Gatekeeper prompt.
-This is a local, unsigned build — it is not notarized for distribution to other
-machines.
+Then drag `dist/mac-arm64/Pomodoro.app` into `/Applications`. This is a local,
+unsigned build (`mac.identity: null`) — because you built it yourself it carries
+no quarantine flag, so macOS launches it without a Gatekeeper prompt. It is not
+notarized for distribution to other machines.
 ```
 
 - [ ] **Step 3: Verify the iconset stays untracked**
