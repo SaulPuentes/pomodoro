@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- stem + calyx: solid red, drawn first (additive, same colour) -->
+  <g fill="#E23A2E">
+    <rect x="497" y="170" width="30" height="74" rx="15"/>
+    <ellipse cx="468" cy="222" rx="58" ry="24" transform="rotate(-22 512 226)"/>
+    <ellipse cx="556" cy="222" rx="58" ry="24" transform="rotate(22 512 226)"/>
+  </g>
+  <!-- body + 12 clock marks + hub as holes via even-odd fill -->
+  <path fill="#E23A2E" fill-rule="evenodd" d="
+    M 192 548 a 320 320 0 1 0 640 0 a 320 320 0 1 0 -640 0 Z
+    M 490 282 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0 Z
+    M 622 315 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 713 423 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 740 548 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0 Z
+    M 713 673 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 622 781 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 490 814 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0 Z
+    M 372 781 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 281 673 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 240 548 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0 Z
+    M 281 423 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 372 315 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 494 548 a 18 18 0 1 0 36 0 a 18 18 0 1 0 -36 0 Z
+  "/>
+</svg>

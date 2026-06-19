@@ -37,36 +37,34 @@ Create `build/icon.svg` exactly:
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-  <defs>
-    <mask id="cut">
-      <!-- white = visible red; black = transparent cutout -->
-      <!-- tomato body -->
-      <ellipse cx="512" cy="548" rx="345" ry="315" fill="white"/>
-      <!-- stem + calyx (same silhouette, no separate colour) -->
-      <rect x="496" y="150" width="32" height="80" rx="16" fill="white"/>
-      <ellipse cx="470" cy="205" rx="62" ry="26" fill="white" transform="rotate(-25 512 210)"/>
-      <ellipse cx="554" cy="205" rx="62" ry="26" fill="white" transform="rotate(25 512 210)"/>
-      <!-- clock tick marks (cutouts) -->
-      <g fill="black">
-        <rect x="503" y="240" width="18" height="64" rx="9" transform="rotate(0 512 540)"/>
-        <rect x="503" y="240" width="18" height="46" rx="9" transform="rotate(30 512 540)"/>
-        <rect x="503" y="240" width="18" height="46" rx="9" transform="rotate(60 512 540)"/>
-        <rect x="503" y="240" width="18" height="64" rx="9" transform="rotate(90 512 540)"/>
-        <rect x="503" y="240" width="18" height="46" rx="9" transform="rotate(120 512 540)"/>
-        <rect x="503" y="240" width="18" height="46" rx="9" transform="rotate(150 512 540)"/>
-        <rect x="503" y="240" width="18" height="64" rx="9" transform="rotate(180 512 540)"/>
-        <rect x="503" y="240" width="18" height="46" rx="9" transform="rotate(210 512 540)"/>
-        <rect x="503" y="240" width="18" height="46" rx="9" transform="rotate(240 512 540)"/>
-        <rect x="503" y="240" width="18" height="64" rx="9" transform="rotate(270 512 540)"/>
-        <rect x="503" y="240" width="18" height="46" rx="9" transform="rotate(300 512 540)"/>
-        <rect x="503" y="240" width="18" height="46" rx="9" transform="rotate(330 512 540)"/>
-        <!-- centre hub -->
-        <circle cx="512" cy="540" r="16"/>
-      </g>
-    </mask>
-  </defs>
-  <rect width="1024" height="1024" fill="#E23A2E" mask="url(#cut)"/>
+  <!-- stem + calyx: solid red, drawn first (additive, same colour) -->
+  <g fill="#E23A2E">
+    <rect x="497" y="170" width="30" height="74" rx="15"/>
+    <ellipse cx="468" cy="222" rx="58" ry="24" transform="rotate(-22 512 226)"/>
+    <ellipse cx="556" cy="222" rx="58" ry="24" transform="rotate(22 512 226)"/>
+  </g>
+  <!-- body + 12 clock marks + hub as holes via even-odd fill -->
+  <path fill="#E23A2E" fill-rule="evenodd" d="
+    M 192 548 a 320 320 0 1 0 640 0 a 320 320 0 1 0 -640 0 Z
+    M 490 282 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0 Z
+    M 622 315 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 713 423 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 740 548 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0 Z
+    M 713 673 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 622 781 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 490 814 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0 Z
+    M 372 781 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 281 673 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 240 548 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0 Z
+    M 281 423 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 372 315 a 15 15 0 1 0 30 0 a 15 15 0 1 0 -30 0 Z
+    M 494 548 a 18 18 0 1 0 36 0 a 18 18 0 1 0 -36 0 Z
+  "/>
 </svg>
+
+> **Note:** the original mask-based SVG did not render its cutouts under
+> `cairosvg` (the icns renderer). Replaced with an `even-odd` fill path, whose
+> holes render reliably across `cairosvg` and ImageMagick.
 ```
 
 - [ ] **Step 2: Create the icon build script**
