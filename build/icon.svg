@@ -7,9 +7,8 @@
   </defs>
   <!-- full-bleed red gradient background -->
   <rect width="1024" height="1024" fill="url(#bg)"/>
-  <!-- white clock: outer ring + 12 tick marks (no hands, no hub) -->
+  <!-- white clock: 12 tick marks + hour/minute hands posed at 10:10 (no outer ring) -->
   <g fill="none" stroke="#FFFFFF" stroke-linecap="round">
-    <circle cx="512" cy="512" r="360" stroke-width="40"/>
     <!-- cardinal ticks: 12, 3, 6, 9 -->
     <g stroke-width="34">
       <line x1="512" y1="190" x2="512" y2="262" transform="rotate(0 512 512)"/>
@@ -28,5 +27,11 @@
       <line x1="512" y1="190" x2="512" y2="232" transform="rotate(300 512 512)"/>
       <line x1="512" y1="190" x2="512" y2="232" transform="rotate(330 512 512)"/>
     </g>
+    <!-- hour hand (shorter, thicker) toward ~10 o'clock -->
+    <line x1="512" y1="512" x2="512" y2="357" stroke-width="40" transform="rotate(305 512 512)"/>
+    <!-- minute hand (longer, thinner) toward 2 o'clock -->
+    <line x1="512" y1="512" x2="512" y2="282" stroke-width="30" transform="rotate(60 512 512)"/>
   </g>
+  <!-- center hub -->
+  <circle cx="512" cy="512" r="32" fill="#FFFFFF"/>
 </svg>
