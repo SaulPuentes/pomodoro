@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeImage } = require('electron');
 const path = require('path');
 
 let win = null;
@@ -19,6 +19,12 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  if (process.platform === 'darwin' && app.dock) {
+    const dockIcon = nativeImage.createFromPath(
+      path.join(__dirname, 'build', 'icon.png')
+    );
+    if (!dockIcon.isEmpty()) app.dock.setIcon(dockIcon);
+  }
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

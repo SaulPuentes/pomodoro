@@ -45,6 +45,20 @@ The pure logic — the timer state machine (`src/timer.mjs`) and persistence
 (`src/storage.mjs`) — is unit tested. UI, window control, and sound are verified
 manually.
 
+## Build the Mac app
+
+Produce a double-clickable `Pomodoro.app` for your own Mac (Apple Silicon):
+
+```bash
+npm run icon   # render build/icon.icns from build/icon.svg (run once, or after editing the icon)
+npm run dist   # package into dist/mac-arm64/Pomodoro.app
+```
+
+Then drag `dist/mac-arm64/Pomodoro.app` into `/Applications`. This is a local,
+unsigned build — because you built it yourself it carries no quarantine flag, so
+macOS launches it without a Gatekeeper prompt. It is not notarized for
+distribution to other machines.
+
 ## How It Works
 
 - `main.js` — Electron main process: owns the single window and the
