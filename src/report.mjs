@@ -14,6 +14,7 @@ function isoParts(date) {
   d.setUTCDate(d.getUTCDate() + 4 - isoDay);    // shift to this week's Thursday
   const year = d.getUTCFullYear();
   const yearStart = new Date(Date.UTC(year, 0, 1));
+  // +1 turns the 0-based day offset from Jan 1 into a 1-based day-of-year before dividing into weeks.
   const week = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
   return { year, week };
 }

@@ -54,3 +54,8 @@ test('thisWeek: only the current week, project totals only', () => {
   assert.deepEqual(tw.projects.map((p) => p.name), ['Website', 'Emails']);
   assert.equal('tasks' in tw.projects[0], false);
 });
+
+test('empty timelog: weekOf and weeks return empty shapes', () => {
+  assert.deepEqual(report.weekOf({}, '2026-W26'), { total: 0, projects: [] });
+  assert.deepEqual(report.weeks({}), []);
+});

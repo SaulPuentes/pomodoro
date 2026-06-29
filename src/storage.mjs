@@ -77,9 +77,6 @@ export function loadGoal(store) {
   return typeof raw === 'string' ? raw : '';
 }
 
-export function saveGoal(store, goal) {
-  store.setItem(GOAL_KEY, goal || '');
-}
 
 export function incrementToday(store, now = new Date()) {
   const key = todayKey(now);

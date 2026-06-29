@@ -352,6 +352,7 @@ function showDrawer(name) {
   closeDrawer();
   const el = $(`drawer-${name}`);
   if (!el) return;
+  if (name === 'reports') renderReports();
   el.hidden = false;
   $('backdrop').hidden = false;
   openDrawer = el;
@@ -400,7 +401,7 @@ $('project').addEventListener('change', () => {
   const sel = $('project');
   if (sel.value === '__new__') {
     const name = (window.prompt('New project name') || '').trim();
-    if (name) {
+    if (name && name !== '__new__' && name !== 'No project') {
       storage.addProject(store, name);
       active = { ...active, project: name };
       storage.saveActive(store, active);
