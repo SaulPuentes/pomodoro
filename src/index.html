@@ -95,6 +95,18 @@
       </section>
     </aside>
 
+    <aside id="drawer-projects" class="drawer" hidden>
+      <header class="drawer-head">
+        <h2>Projects</h2>
+        <button class="link" data-close>Done</button>
+      </header>
+      <div class="proj-add">
+        <input id="newProject" type="text" maxlength="40" autocomplete="off" placeholder="New project name" aria-label="New project name" />
+        <button id="addProject" class="btn">Add</button>
+      </div>
+      <ul id="projectList" class="proj-list"></ul>
+    </aside>
+
     <script type="module" src="renderer.mjs"></script>
   </body>
 </html>
