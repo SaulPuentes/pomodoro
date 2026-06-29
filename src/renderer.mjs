@@ -134,7 +134,7 @@ function onComplete() {
   }
   if (settings.soundEnabled) playBeep();
   render();
-  renderHistory();
+  renderReports();
 }
 
 /* ---- Controls ---- */
@@ -230,29 +230,120 @@ $('fetchUnsplash').addEventListener('click', async () => {
   }
 });
 
-/* ---- History ---- */
-function renderHistory() {
-  const history = storage.loadHistory(store);
-  const list = $('history');
+/* ---- Reports ---- */
+function fmtMins(m) {
+  const h = Math.floor(m / 60);
+  const min = m % 60;
+  if (h && min) return `${h}h ${min}m`;
+  if (h) return `${h}h`;
+  return `${min}m`;
+}
+
+function barRow(name, minutes, max) {
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  const label = document.createElement('span');
+  label.className = 'bar-label';
+  label.textContent = name;
+  const track = document.createElement('span');
+  track.className = 'bar-track';
+  const fill = document.createElement('span');
+  fill.className = 'bar-fill';
+  fill.style.width = `${max > 0 ? (minutes / max) * 100 : 0}%`;
+  track.appendChild(fill);
+  const val = document.createElement('span');
+  val.className = 'bar-val';
+  val.textContent = fmtMins(minutes);
+  row.append(label, track, val);
+  return row;
+}
+
+function renderThisWeek() {
+  const el = $('thisWeek');
+  el.innerHTML = '';
+  const data = report.thisWeek(storage.loadTimelog(store), new Date());
+  if (data.total === 0) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = 'No focus time yet this week.';
+    el.appendChild(p);
+    return;
+  }
+  const total = document.createElement('p');
+  total.className = 'report-total';
+  total.textContent = `Total  ${fmtMins(data.total)}`;
+  el.appendChild(total);
+  const max = Math.max(...data.projects.map((p) => p.minutes));
+  for (const p of data.projects) el.appendChild(barRow(p.name, p.minutes, max));
+}
+
+function weekRow(weekKey, log) {
+  const wk = report.weekOf(log, weekKey);
+  const li = document.createElement('li');
+  li.className = 'week';
+
+  const head = document.createElement('button');
+  head.className = 'week-head';
+  head.setAttribute('aria-expanded', 'false');
+  const lbl = document.createElement('span');
+  lbl.textContent = report.weekLabel(weekKey);
+  const tot = document.createElement('span');
+  tot.className = 'week-total';
+  tot.textContent = fmtMins(wk.total);
+  head.append(lbl, tot);
+
+  const body = document.createElement('div');
+  body.className = 'week-body';
+  body.hidden = true;
+  for (const p of wk.projects) {
+    const pr = document.createElement('div');
+    pr.className = 'wb-project';
+    const pn = document.createElement('span');
+    pn.textContent = p.name;
+    const pm = document.createElement('span');
+    pm.textContent = fmtMins(p.minutes);
+    pr.append(pn, pm);
+    body.appendChild(pr);
+    for (const t of p.tasks) {
+      const tr = document.createElement('div');
+      tr.className = 'wb-task';
+      const tn = document.createElement('span');
+      tn.textContent = `· ${t.name || '(untitled)'}`;
+      const tm = document.createElement('span');
+      tm.textContent = fmtMins(t.minutes);
+      tr.append(tn, tm);
+      body.appendChild(tr);
+    }
+  }
+
+  head.addEventListener('click', () => {
+    const open = body.hidden;
+    body.hidden = !open;
+    head.setAttribute('aria-expanded', String(open));
+  });
+  li.append(head, body);
+  return li;
+}
+
+function renderWeekList() {
+  const list = $('weekList');
   list.innerHTML = '';
-  const dates = Object.keys(history).sort().reverse();
-  if (dates.length === 0) {
+  const log = storage.loadTimelog(store);
+  const current = report.isoWeekKey(new Date());
+  const keys = report.weeks(log).filter((k) => k !== current);
+  if (keys.length === 0) {
     const li = document.createElement('li');
     li.className = 'empty';
-    li.textContent = 'No sessions yet. Start your first focus block.';
+    li.textContent = 'No earlier weeks yet.';
     list.appendChild(li);
     return;
   }
-  for (const date of dates) {
-    const li = document.createElement('li');
-    const d = document.createElement('span');
-    d.textContent = date;
-    const c = document.createElement('span');
-    c.className = 'h-count';
-    c.textContent = history[date];
-    li.append(d, c);
-    list.appendChild(li);
-  }
+  for (const key of keys) list.appendChild(weekRow(key, log));
+}
+
+function renderReports() {
+  renderThisWeek();
+  renderWeekList();
 }
 
 /* ---- Drawers ---- */
@@ -331,5 +422,6 @@ $('goal').addEventListener('input', () => {
 applyBackground(currentBg, { persist: false });
 buildFilmstrip();
 loadSettingsUI();
-renderHistory();
+renderProjects();
+renderReports();
 render();
