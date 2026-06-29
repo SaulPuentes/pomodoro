@@ -2,9 +2,11 @@ import * as timer from './timer.mjs';
 import * as storage from './storage.mjs';
 import * as bg from './backgrounds.mjs';
 import { playBeep } from './sound.mjs';
+import * as report from './report.mjs';
 
 const store = window.localStorage;
 let settings = storage.loadSettings(store);
+let active = storage.loadActive(store);
 let state = timer.initState(settings);
 let currentBg = storage.loadBackground(store) || bg.defaultBackground();
 let tickHandle = null;
@@ -122,6 +124,12 @@ function onComplete() {
   state = timer.complete(state, settings);
   if (wasWork) {
     storage.incrementToday(store, new Date());
+    storage.logFocus(store, {
+      project: active.project,
+      task: active.task,
+      minutes: settings.workMin,
+      now: new Date(),
+    });
     window.pomodoro?.sessionEnded?.();
   }
   if (settings.soundEnabled) playBeep();
@@ -272,6 +280,51 @@ document.querySelectorAll('[data-close]').forEach((b) => {
 $('backdrop').addEventListener('click', closeDrawer);
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeDrawer();
+});
+
+/* ---- Project + task ---- */
+function renderProjects() {
+  const sel = $('project');
+  const names = storage.loadProjects(store);
+  if (active.project && !names.includes(active.project)) names.unshift(active.project);
+  sel.innerHTML = '';
+  const none = document.createElement('option');
+  none.value = '';
+  none.textContent = 'No project';
+  sel.appendChild(none);
+  for (const name of names) {
+    const o = document.createElement('option');
+    o.value = name;
+    o.textContent = name;
+    sel.appendChild(o);
+  }
+  const add = document.createElement('option');
+  add.value = '__new__';
+  add.textContent = '＋ New project…';
+  sel.appendChild(add);
+  sel.value = active.project || '';
+}
+
+$('project').addEventListener('change', () => {
+  const sel = $('project');
+  if (sel.value === '__new__') {
+    const name = (window.prompt('New project name') || '').trim();
+    if (name) {
+      storage.addProject(store, name);
+      active = { ...active, project: name };
+      storage.saveActive(store, active);
+    }
+    renderProjects(); // resets selection to active.project (handles cancel)
+    return;
+  }
+  active = { ...active, project: sel.value };
+  storage.saveActive(store, active);
+});
+
+$('goal').value = active.task;
+$('goal').addEventListener('input', () => {
+  active = { ...active, task: $('goal').value };
+  storage.saveActive(store, active);
 });
 
 /* ---- Boot ---- */
