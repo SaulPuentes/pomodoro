@@ -353,6 +353,7 @@ function showDrawer(name) {
   const el = $(`drawer-${name}`);
   if (!el) return;
   if (name === 'reports') renderReports();
+  if (name === 'projects') renderProjectList();
   el.hidden = false;
   $('backdrop').hidden = false;
   openDrawer = el;
@@ -397,16 +398,109 @@ function renderProjects() {
   sel.value = active.project || '';
 }
 
+function setActiveProject(name) {
+  active = { ...active, project: name };
+  storage.saveActive(store, active);
+}
+
+function refreshProjectsUI() {
+  renderProjects();     // the <select>
+  renderProjectList();  // the drawer list
+  renderReports();      // names may have changed
+}
+
+function startRename(li, oldName) {
+  let done = false;
+  const input = document.createElement('input');
+  input.className = 'proj-edit';
+  input.type = 'text';
+  input.maxLength = 40;
+  input.value = oldName;
+  const finish = (save) => {
+    if (done) return;
+    done = true;
+    input.removeEventListener('blur', onBlur);
+    if (save) {
+      const next = input.value.trim();
+      if (next && next !== oldName && next !== '__new__' && next !== 'No project') {
+        storage.renameProject(store, oldName, next);
+        if (active.project === oldName) setActiveProject(next);
+      }
+    }
+    refreshProjectsUI();
+  };
+  const onBlur = () => finish(true);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') finish(true);
+    if (e.key === 'Escape') finish(false);
+  });
+  input.addEventListener('blur', onBlur);
+  li.replaceChildren(input);
+  input.focus();
+  input.select();
+}
+
+function projectRow(name) {
+  const li = document.createElement('li');
+  li.className = 'proj-row';
+
+  const label = document.createElement('span');
+  label.className = 'proj-name';
+  label.textContent = name;
+
+  const rename = document.createElement('button');
+  rename.className = 'proj-act';
+  rename.textContent = 'Rename';
+  rename.addEventListener('click', () => startRename(li, name));
+
+  const del = document.createElement('button');
+  del.className = 'proj-act';
+  del.textContent = 'Delete';
+  del.addEventListener('click', () => {
+    storage.deleteProject(store, name);
+    if (active.project === name) setActiveProject('');
+    refreshProjectsUI();
+  });
+
+  li.append(label, rename, del);
+  return li;
+}
+
+function renderProjectList() {
+  const list = $('projectList');
+  list.innerHTML = '';
+  const names = storage.loadProjects(store);
+  if (names.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'proj-empty';
+    li.textContent = 'No projects yet. Add one above.';
+    list.appendChild(li);
+    return;
+  }
+  for (const name of names) list.appendChild(projectRow(name));
+}
+
+function addProjectFromInput() {
+  const input = $('newProject');
+  const name = input.value.trim();
+  if (name && name !== '__new__' && name !== 'No project') {
+    storage.addProject(store, name);
+    setActiveProject(name);
+  }
+  input.value = '';
+  refreshProjectsUI();
+}
+
+$('addProject').addEventListener('click', addProjectFromInput);
+$('newProject').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') addProjectFromInput();
+});
+
 $('project').addEventListener('change', () => {
   const sel = $('project');
   if (sel.value === '__new__') {
-    const name = (window.prompt('New project name') || '').trim();
-    if (name && name !== '__new__' && name !== 'No project') {
-      storage.addProject(store, name);
-      active = { ...active, project: name };
-      storage.saveActive(store, active);
-    }
-    renderProjects(); // resets selection to active.project (handles cancel)
+    renderProjects();        // restore the real selection; '__new__' is just a trigger
+    showDrawer('projects');
     return;
   }
   active = { ...active, project: sel.value };
