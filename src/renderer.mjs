@@ -431,8 +431,9 @@ function startRename(li, oldName) {
   };
   const onBlur = () => finish(true);
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') finish(true);
-    if (e.key === 'Escape') finish(false);
+    if (e.key !== 'Enter' && e.key !== 'Escape') return;
+    e.stopPropagation(); // keep Escape from bubbling to the drawer-closing handler
+    finish(e.key === 'Enter');
   });
   input.addEventListener('blur', onBlur);
   li.replaceChildren(input);
