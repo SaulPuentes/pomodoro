@@ -106,6 +106,40 @@ export function addProject(store, name) {
   return list;
 }
 
+export function renameProject(store, oldName, newName) {
+  const from = (oldName || '').trim();
+  const to = (newName || '').trim();
+  const list = loadProjects(store);
+  if (!from || !to || from === to) return list;
+  const next = [];
+  for (const n of list) {
+    const name = n === from ? to : n;
+    if (!next.includes(name)) next.push(name);
+  }
+  if (!next.includes(to)) next.push(to); // covers renaming an active-only project not in the list
+  saveProjects(store, next);
+  // migrate history so reports stay consolidated under the new name
+  const log = loadTimelog(store);
+  let touched = false;
+  for (const day of Object.values(log)) {
+    if (!day[from]) continue;
+    const dst = day[to] || (day[to] = {});
+    for (const [task, mins] of Object.entries(day[from])) dst[task] = (dst[task] || 0) + mins;
+    delete day[from];
+    touched = true;
+  }
+  if (touched) store.setItem(TIMELOG_KEY, JSON.stringify(log));
+  return next;
+}
+
+export function deleteProject(store, name) {
+  const n = (name || '').trim();
+  const list = loadProjects(store).filter((p) => p !== n);
+  saveProjects(store, list);
+  // ponytail: timelog history kept on purpose — reports still reflect past time; delete only drops the dropdown option
+  return list;
+}
+
 export function loadActive(store) {
   const a = readJSON(store, ACTIVE_KEY, null);
   if (a && typeof a === 'object') {

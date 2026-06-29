@@ -116,3 +116,43 @@ test('timelog trims to the most recent 180 days', () => {
   assert.equal(Object.keys(storage.loadTimelog(st)).length, 180);
   assert.ok(!('2026-01-01' in storage.loadTimelog(st))); // oldest dropped
 });
+
+test('renameProject updates the list and migrates timelog minutes', () => {
+  const st = fakeStore();
+  storage.addProject(st, 'Website');
+  const d = new Date('2026-06-22T10:00:00');
+  storage.logFocus(st, { project: 'Website', task: 'landing', minutes: 25, now: d });
+  storage.renameProject(st, 'Website', 'Marketing');
+  assert.deepEqual(storage.loadProjects(st), ['Marketing']);
+  assert.deepEqual(storage.loadTimelog(st)['2026-06-22'], { Marketing: { landing: 25 } });
+});
+
+test('renameProject merges into an existing project (dedupes, sums minutes)', () => {
+  const st = fakeStore();
+  storage.addProject(st, 'Old');
+  storage.addProject(st, 'New');
+  const d = new Date('2026-06-22T10:00:00');
+  storage.logFocus(st, { project: 'Old', task: 't', minutes: 25, now: d });
+  storage.logFocus(st, { project: 'New', task: 't', minutes: 25, now: d });
+  storage.renameProject(st, 'Old', 'New');
+  assert.deepEqual(storage.loadProjects(st), ['New']);
+  assert.deepEqual(storage.loadTimelog(st)['2026-06-22'], { New: { t: 50 } });
+});
+
+test('renameProject ignores blank or unchanged names', () => {
+  const st = fakeStore();
+  storage.addProject(st, 'Website');
+  storage.renameProject(st, 'Website', '   ');
+  storage.renameProject(st, 'Website', 'Website');
+  assert.deepEqual(storage.loadProjects(st), ['Website']);
+});
+
+test('deleteProject removes it from the list but keeps history', () => {
+  const st = fakeStore();
+  storage.addProject(st, 'Website');
+  const d = new Date('2026-06-22T10:00:00');
+  storage.logFocus(st, { project: 'Website', task: 'landing', minutes: 25, now: d });
+  storage.deleteProject(st, 'Website');
+  assert.deepEqual(storage.loadProjects(st), []);
+  assert.deepEqual(storage.loadTimelog(st)['2026-06-22'], { Website: { landing: 25 } });
+});
