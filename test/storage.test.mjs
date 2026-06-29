@@ -65,3 +65,54 @@ test('history trims to the most recent 30 days', () => {
   assert.ok(!('2026-01-01' in h)); // oldest dropped
   assert.ok('2026-02-04' in h);    // 35th day kept
 });
+
+test('loadProjects empty by default; addProject dedupes and trims', () => {
+  const st = fakeStore();
+  assert.deepEqual(storage.loadProjects(st), []);
+  storage.addProject(st, '  Website  ');
+  storage.addProject(st, 'Website');   // dupe ignored
+  storage.addProject(st, 'Emails');
+  storage.addProject(st, '   ');        // blank ignored
+  assert.deepEqual(storage.loadProjects(st), ['Website', 'Emails']);
+});
+
+test('loadActive migrates a legacy goal string', () => {
+  const st = fakeStore();
+  st.setItem('pomodoro.goal', 'Ship the report');
+  assert.deepEqual(storage.loadActive(st), { project: '', task: 'Ship the report' });
+});
+
+test('save then load round-trips active selection', () => {
+  const st = fakeStore();
+  storage.saveActive(st, { project: 'Website', task: 'landing' });
+  assert.deepEqual(storage.loadActive(st), { project: 'Website', task: 'landing' });
+});
+
+test('logFocus accumulates minutes per project/task per day', () => {
+  const st = fakeStore();
+  const d = new Date('2026-06-22T10:00:00');
+  storage.logFocus(st, { project: 'Website', task: 'landing', minutes: 25, now: d });
+  storage.logFocus(st, { project: 'Website', task: 'landing', minutes: 25, now: d });
+  storage.logFocus(st, { project: 'Website', task: 'nav', minutes: 25, now: d });
+  assert.deepEqual(storage.loadTimelog(st)['2026-06-22'], {
+    Website: { landing: 50, nav: 25 },
+  });
+});
+
+test('logFocus buckets empty project under "No project"', () => {
+  const st = fakeStore();
+  const d = new Date('2026-06-22T10:00:00');
+  storage.logFocus(st, { project: '', task: '', minutes: 25, now: d });
+  assert.deepEqual(storage.loadTimelog(st)['2026-06-22'], { 'No project': { '': 25 } });
+});
+
+test('timelog trims to the most recent 180 days', () => {
+  const st = fakeStore();
+  for (let i = 0; i < 200; i++) {
+    const d = new Date('2026-01-01T10:00:00');
+    d.setDate(d.getDate() + i);
+    storage.logFocus(st, { project: 'P', task: 't', minutes: 25, now: d });
+  }
+  assert.equal(Object.keys(storage.loadTimelog(st)).length, 180);
+  assert.ok(!('2026-01-01' in storage.loadTimelog(st))); // oldest dropped
+});
