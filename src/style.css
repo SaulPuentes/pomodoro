@@ -504,7 +504,7 @@ body {
 }
 .bar-row {
   display: grid;
-  grid-template-columns: 1fr 90px auto;
+  grid-template-columns: 1fr 90px 64px; /* ponytail: 64px holds up to "99h 59m" at 13px; longer values fall to the "Xh" branch and shrink */
   align-items: center;
   gap: 10px;
   margin: 8px 0;
@@ -523,7 +523,7 @@ body {
   border-radius: 999px;
   background: var(--accent);
 }
-.bar-val { color: var(--mist-dim); font-variant-numeric: tabular-nums; }
+.bar-val { color: var(--mist-dim); font-variant-numeric: tabular-nums; text-align: right; }
 
 .weeks { list-style: none; margin: 0; padding: 0; }
 .week { border-bottom: 1px solid rgba(244, 247, 244, 0.08); }
