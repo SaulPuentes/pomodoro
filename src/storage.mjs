@@ -157,8 +157,11 @@ export function saveActive(store, active) {
 
 export function loadTimelog(store) {
   const log = readJSON(store, TIMELOG_KEY, {});
-  // ponytail: strip legacy 'No project' bucket on read; self-persists on next logFocus write
-  for (const day of Object.values(log)) delete day['No project'];
+  // ponytail: strip legacy 'No project' bucket on read; drop days it empties so reports show no phantom weeks
+  for (const [date, day] of Object.entries(log)) {
+    delete day['No project'];
+    if (Object.keys(day).length === 0) delete log[date];
+  }
   return log;
 }
 

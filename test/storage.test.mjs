@@ -107,7 +107,7 @@ test('logFocus skips focus time that has no project', () => {
   assert.deepEqual(storage.loadTimelog(st), {});
 });
 
-test('loadTimelog strips legacy "No project" buckets', () => {
+test('loadTimelog strips legacy "No project" buckets and drops emptied days', () => {
   const st = fakeStore();
   st.setItem('pomodoro.timelog', JSON.stringify({
     '2026-06-22': { 'No project': { '': 25 }, Website: { landing: 50 } },
@@ -115,7 +115,6 @@ test('loadTimelog strips legacy "No project" buckets', () => {
   }));
   assert.deepEqual(storage.loadTimelog(st), {
     '2026-06-22': { Website: { landing: 50 } },
-    '2026-06-23': {},
   });
 });
 
