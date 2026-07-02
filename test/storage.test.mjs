@@ -99,11 +99,12 @@ test('logFocus accumulates minutes per project/task per day', () => {
   });
 });
 
-test('logFocus buckets empty project under "No project"', () => {
+test('logFocus skips focus time that has no project', () => {
   const st = fakeStore();
   const d = new Date('2026-06-22T10:00:00');
   storage.logFocus(st, { project: '', task: '', minutes: 25, now: d });
-  assert.deepEqual(storage.loadTimelog(st)['2026-06-22'], { 'No project': { '': 25 } });
+  storage.logFocus(st, { project: '   ', task: 'x', minutes: 25, now: d });
+  assert.deepEqual(storage.loadTimelog(st), {});
 });
 
 test('timelog trims to the most recent 180 days', () => {

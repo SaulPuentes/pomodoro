@@ -160,8 +160,9 @@ export function loadTimelog(store) {
 }
 
 export function logFocus(store, { project, task, minutes, now = new Date() }) {
+  const proj = (project || '').trim();
+  if (!proj) return loadTimelog(store); // no project → not logged; daily count still increments in the caller
   const key = todayKey(now);
-  const proj = (project || '').trim() || 'No project';
   const t = (task || '').trim();
   const log = loadTimelog(store);
   const day = log[key] || (log[key] = {});
