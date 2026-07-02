@@ -156,12 +156,20 @@ export function saveActive(store, active) {
 }
 
 export function loadTimelog(store) {
-  return readJSON(store, TIMELOG_KEY, {});
+  const log = readJSON(store, TIMELOG_KEY, {});
+  // ponytail: strip legacy 'No project' bucket on read; drop days it empties so reports show no phantom weeks
+  for (const [date, day] of Object.entries(log)) {
+    if (!day || typeof day !== 'object') continue;
+    delete day['No project'];
+    if (Object.keys(day).length === 0) delete log[date];
+  }
+  return log;
 }
 
 export function logFocus(store, { project, task, minutes, now = new Date() }) {
+  const proj = (project || '').trim();
+  if (!proj) return loadTimelog(store); // no project → not logged; daily count still increments in the caller
   const key = todayKey(now);
-  const proj = (project || '').trim() || 'No project';
   const t = (task || '').trim();
   const log = loadTimelog(store);
   const day = log[key] || (log[key] = {});

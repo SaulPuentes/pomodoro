@@ -380,11 +380,8 @@ function renderProjects() {
   const sel = $('project');
   const names = storage.loadProjects(store);
   if (active.project && !names.includes(active.project)) names.unshift(active.project);
+  if (!active.project && names.length) setActiveProject(names[0]); // force a project whenever any exist
   sel.innerHTML = '';
-  const none = document.createElement('option');
-  none.value = '';
-  none.textContent = 'No project';
-  sel.appendChild(none);
   for (const name of names) {
     const o = document.createElement('option');
     o.value = name;
@@ -395,7 +392,7 @@ function renderProjects() {
   add.value = '__new__';
   add.textContent = '＋ New project…';
   sel.appendChild(add);
-  sel.value = active.project || '';
+  sel.value = active.project || '__new__';
 }
 
 function setActiveProject(name) {
