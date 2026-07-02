@@ -156,7 +156,10 @@ export function saveActive(store, active) {
 }
 
 export function loadTimelog(store) {
-  return readJSON(store, TIMELOG_KEY, {});
+  const log = readJSON(store, TIMELOG_KEY, {});
+  // ponytail: strip legacy 'No project' bucket on read; self-persists on next logFocus write
+  for (const day of Object.values(log)) delete day['No project'];
+  return log;
 }
 
 export function logFocus(store, { project, task, minutes, now = new Date() }) {
