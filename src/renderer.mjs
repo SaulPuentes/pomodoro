@@ -419,7 +419,7 @@ function startRename(li, oldName) {
     input.removeEventListener('blur', onBlur);
     if (save) {
       const next = input.value.trim();
-      if (next && next !== oldName && next !== '__new__') {
+      if (next && next !== oldName && next !== '__new__' && next !== 'No project') {
         storage.renameProject(store, oldName, next);
         if (active.project === oldName) setActiveProject(next);
       }
@@ -481,7 +481,7 @@ function renderProjectList() {
 function addProjectFromInput() {
   const input = $('newProject');
   const name = input.value.trim();
-  if (name && name !== '__new__') {
+  if (name && name !== '__new__' && name !== 'No project') {
     storage.addProject(store, name);
     setActiveProject(name);
   }
