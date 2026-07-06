@@ -3,6 +3,7 @@ import * as storage from './storage.mjs';
 import * as bg from './backgrounds.mjs';
 import { playBeep } from './sound.mjs';
 import * as report from './report.mjs';
+import * as session from './session.mjs';
 
 const store = window.localStorage;
 let settings = storage.loadSettings(store);
@@ -10,6 +11,12 @@ let active = storage.loadActive(store);
 let state = timer.initState(settings);
 let currentBg = storage.loadBackground(store) || bg.defaultBackground();
 let tickHandle = null;
+
+let sess = session.beginSession(timer.durationMsFor(timer.PHASES.WORK, settings));
+
+function beginWorkSession() {
+  sess = session.beginSession(timer.durationMsFor(timer.PHASES.WORK, settings));
+}
 
 const $ = (id) => document.getElementById(id);
 const PHASE_LABEL = { work: 'in focus', short: 'short break', long: 'long break' };
@@ -121,17 +128,27 @@ function stopTick() {
 function onComplete() {
   stopTick();
   const wasWork = state.phase === timer.PHASES.WORK;
+  const finished = wasWork
+    ? session.closeSession(sess, {
+        project: active.project,
+        task: active.task,
+        totalMin: settings.workMin,
+      })
+    : [];
   state = timer.complete(state, settings);
   if (wasWork) {
     storage.incrementToday(store, new Date());
-    storage.logFocus(store, {
-      project: active.project,
-      task: active.task,
-      minutes: settings.workMin,
-      now: new Date(),
-    });
+    for (const seg of finished) {
+      storage.logFocus(store, {
+        project: seg.project,
+        task: seg.task,
+        minutes: seg.minutes,
+        now: new Date(),
+      });
+    }
     window.pomodoro?.sessionEnded?.();
   }
+  beginWorkSession();
   if (settings.soundEnabled) playBeep();
   render();
   renderReports();
@@ -153,12 +170,14 @@ $('startPause').addEventListener('click', () => {
 $('reset').addEventListener('click', () => {
   stopTick();
   state = timer.reset(state, settings);
+  beginWorkSession();
   render();
 });
 
 $('skip').addEventListener('click', () => {
   stopTick();
   state = timer.skip(state, settings);
+  beginWorkSession();
   render();
 });
 
@@ -188,6 +207,7 @@ function onSettingsChange() {
   loadSettingsUI();
   if (!state.running) {
     state = { ...state, remainingMs: timer.durationMsFor(state.phase, settings) };
+    beginWorkSession();
   }
   render();
 }
@@ -396,6 +416,15 @@ function renderProjects() {
 }
 
 function setActiveProject(name) {
+  // Close the current segment before the project changes; only the work
+  // phase tracks segments. Paused time never counts: remaining is frozen.
+  if (state.phase === timer.PHASES.WORK) {
+    sess = session.switchSegment(sess, {
+      project: active.project,
+      task: active.task,
+      remainingMs: timer.remainingAt(state, Date.now()),
+    });
+  }
   active = { ...active, project: name };
   storage.saveActive(store, active);
 }
@@ -421,7 +450,15 @@ function startRename(li, oldName) {
       const next = input.value.trim();
       if (next && next !== oldName && next !== '__new__' && next !== 'No project') {
         storage.renameProject(store, oldName, next);
-        if (active.project === oldName) setActiveProject(next);
+        if (active.project === oldName) {
+          active = { ...active, project: next };
+          storage.saveActive(store, active);
+        }
+        // keep pending segments consistent with the new name
+        sess = {
+          ...sess,
+          segments: sess.segments.map((s) => (s.project === oldName ? { ...s, project: next } : s)),
+        };
       }
     }
     refreshProjectsUI();
@@ -501,8 +538,7 @@ $('project').addEventListener('change', () => {
     showDrawer('projects');
     return;
   }
-  active = { ...active, project: sel.value };
-  storage.saveActive(store, active);
+  setActiveProject(sel.value);
 });
 
 $('goal').value = active.task;
