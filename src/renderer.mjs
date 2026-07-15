@@ -395,6 +395,16 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeDrawer();
 });
 
+/* ---- Fullscreen (immersive focus) ---- */
+$('fullscreenBtn').addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen();
+});
+
+document.addEventListener('fullscreenchange', () => {
+  document.documentElement.classList.toggle('fs', !!document.fullscreenElement);
+});
+
 /* ---- Project + task ---- */
 function renderProjects() {
   const sel = $('project');
