@@ -395,6 +395,36 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeDrawer();
 });
 
+/* ---- Fullscreen (immersive focus) ---- */
+const AWAKE_MS = 3000;
+let awakeTimer = null;
+
+function wake() {
+  document.documentElement.classList.add('awake');
+  clearTimeout(awakeTimer);
+  awakeTimer = setTimeout(() => document.documentElement.classList.remove('awake'), AWAKE_MS);
+}
+
+$('fullscreenBtn').addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen();
+});
+
+document.addEventListener('fullscreenchange', () => {
+  const fs = !!document.fullscreenElement;
+  document.documentElement.classList.toggle('fs', fs);
+  if (fs) {
+    wake(); // show chrome on entry so its fade-out tells you where it went
+  } else {
+    clearTimeout(awakeTimer);
+    document.documentElement.classList.remove('awake');
+  }
+});
+
+document.addEventListener('mousemove', () => {
+  if (document.fullscreenElement) wake();
+});
+
 /* ---- Project + task ---- */
 function renderProjects() {
   const sel = $('project');

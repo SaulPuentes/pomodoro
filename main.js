@@ -8,6 +8,7 @@ function createWindow() {
     width: 384,
     height: 660,
     resizable: false,
+    fullscreenable: true, // resizable:false otherwise blocks fullscreen on macOS
     backgroundColor: '#0c1410',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
