@@ -575,6 +575,24 @@ body {
 }
 .fs .phase { font-size: 26px; }
 .fs .goal { font-size: 20px; width: min(480px, 60vw); }
+.fs .project,
+.fs .goal,
+.fs .controls,
+.fs .today,
+.fs .dock {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease);
+}
+.fs.awake .project,
+.fs.awake .goal,
+.fs.awake .controls,
+.fs.awake .today,
+.fs.awake .dock {
+  opacity: 1;
+  pointer-events: auto;
+}
+.fs:not(.awake) body { cursor: none; }
 
 /* ---- Accessibility ---- */
 :focus-visible {
