@@ -563,6 +563,19 @@ body {
   font-style: italic;
 }
 
+/* ---- Fullscreen (immersive focus) ---- */
+.fs .frame::before { display: none; } /* window-frame border reads as chrome; drop it on the big screen */
+.fs .pane {
+  width: min(70vw, 900px);
+  padding: 48px 40px 40px;
+}
+.fs .time {
+  font-size: clamp(6rem, 16vw, 15rem);
+  letter-spacing: -6px;
+}
+.fs .phase { font-size: 26px; }
+.fs .goal { font-size: 20px; width: min(480px, 60vw); }
+
 /* ---- Accessibility ---- */
 :focus-visible {
   outline: 2px solid var(--accent);
