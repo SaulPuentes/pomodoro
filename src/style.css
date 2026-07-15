@@ -566,7 +566,7 @@ body {
 /* ---- Fullscreen (immersive focus) ---- */
 .fs .frame::before { display: none; } /* window-frame border reads as chrome; drop it on the big screen */
 .fs .pane {
-  width: min(70vw, 900px);
+  width: min(58vw, 760px);
   padding: 48px 40px 40px;
 }
 .fs .time {
