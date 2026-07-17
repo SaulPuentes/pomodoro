@@ -154,6 +154,25 @@ function onComplete() {
   renderReports();
 }
 
+/* ---- Daily reset (fresh cycles at 5am) ---- */
+let lastResetDay = storage.resetDayKey();
+
+function maybeDailyReset() {
+  const day = storage.resetDayKey();
+  if (day === lastResetDay) return;
+  lastResetDay = day;
+  if (!settings.dailyResetEnabled) return;
+  if (state.running) {
+    // ponytail: mid-session at 5am — keep the running timer, just drop cycle progress
+    state = { ...state, completedWork: 0 };
+  } else {
+    state = timer.reset(state, settings);
+    beginWorkSession();
+  }
+  render();
+}
+setInterval(maybeDailyReset, 60000);
+
 /* ---- Controls ---- */
 $('startPause').addEventListener('click', () => {
   const now = Date.now();
@@ -192,6 +211,7 @@ function loadSettingsUI() {
   $('shortMin').value = settings.shortMin;
   $('longMin').value = settings.longMin;
   $('soundEnabled').checked = settings.soundEnabled;
+  $('dailyResetEnabled').checked = settings.dailyResetEnabled;
   $('unsplashKey').value = storage.loadUnsplashKey(store);
   refreshFetchButton();
 }
@@ -202,6 +222,7 @@ function onSettingsChange() {
     shortMin: clampInt($('shortMin').value, settings.shortMin),
     longMin: clampInt($('longMin').value, settings.longMin),
     soundEnabled: $('soundEnabled').checked,
+    dailyResetEnabled: $('dailyResetEnabled').checked,
   };
   storage.saveSettings(store, settings);
   loadSettingsUI();
@@ -212,7 +233,7 @@ function onSettingsChange() {
   render();
 }
 
-['workMin', 'shortMin', 'longMin', 'soundEnabled'].forEach((id) => {
+['workMin', 'shortMin', 'longMin', 'soundEnabled', 'dailyResetEnabled'].forEach((id) => {
   $(id).addEventListener('change', onSettingsChange);
 });
 

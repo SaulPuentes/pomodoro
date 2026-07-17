@@ -12,15 +12,21 @@ function fakeStore() {
 
 test('loadSettings returns defaults on empty store', () => {
   assert.deepEqual(storage.loadSettings(fakeStore()), {
-    workMin: 25, shortMin: 5, longMin: 15, soundEnabled: false,
+    workMin: 25, shortMin: 5, longMin: 15, soundEnabled: false, dailyResetEnabled: true,
   });
 });
 
 test('save then load round-trips settings', () => {
   const st = fakeStore();
-  const custom = { workMin: 50, shortMin: 10, longMin: 30, soundEnabled: true };
+  const custom = { workMin: 50, shortMin: 10, longMin: 30, soundEnabled: true, dailyResetEnabled: false };
   storage.saveSettings(st, custom);
   assert.deepEqual(storage.loadSettings(st), custom);
+});
+
+test('resetDayKey flips the day at 5am, not midnight', () => {
+  assert.equal(storage.resetDayKey(new Date('2026-06-18T04:59:00')), '2026-06-17');
+  assert.equal(storage.resetDayKey(new Date('2026-06-18T05:00:00')), '2026-06-18');
+  assert.equal(storage.resetDayKey(new Date('2026-06-18T23:00:00')), '2026-06-18');
 });
 
 test('loadSettings falls back to defaults on corrupt json', () => {

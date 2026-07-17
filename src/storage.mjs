@@ -10,14 +10,22 @@ const MAX_DAYS = 30;
 const TIMELOG_MAX_DAYS = 180;
 
 export const DEFAULT_SETTINGS = {
-  workMin: 25, shortMin: 5, longMin: 15, soundEnabled: false,
+  workMin: 25, shortMin: 5, longMin: 15, soundEnabled: false, dailyResetEnabled: true,
 };
+
+export const RESET_HOUR = 5;
 
 export function todayKey(d = new Date()) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
+}
+
+// Day key that flips at RESET_HOUR instead of midnight, so a night that runs
+// past 12am still counts as the same day until 5am.
+export function resetDayKey(d = new Date()) {
+  return todayKey(new Date(d.getTime() - RESET_HOUR * 3600000));
 }
 
 function readJSON(store, key, fallback) {
