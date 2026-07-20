@@ -710,3 +710,26 @@ body {
   text-transform: lowercase;
   letter-spacing: 0.02em;
 }
+
+.trend-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 160px;
+}
+.trend-col {
+  flex: 1 1 0;
+  min-width: 3px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  border-radius: 3px;
+}
+.trend-col:hover { background: rgba(244, 247, 244, 0.06); }
+.trend-fill {
+  width: 100%;
+  min-height: 2px;
+  background: var(--accent);
+  border-radius: 3px 3px 0 0;
+  transition: height 0.3s var(--ease);
+}

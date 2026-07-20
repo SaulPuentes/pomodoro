@@ -104,7 +104,38 @@ function renderTiles(rep) {
     tile(best, bestSub),
   );
 }
-function renderTrend(rep) {}
+const DAILY_MAX = 45; // beyond this many days, switch to weekly buckets
+
+function renderTrend(rep) {
+  const el = $('trend');
+  el.innerHTML = '';
+  const dayMap = Object.fromEntries(rep.days.map((d) => [d.date, d.minutes]));
+  const keys = report.eachDayKey(state.fromKey, state.toKey);
+  if (keys.length === 0 || rep.total === 0) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = 'No focus time in this range.';
+    el.appendChild(p);
+    return;
+  }
+  const bars = keys.length > DAILY_MAX
+    ? report.toWeekly(keys.map((k) => ({ key: k, minutes: dayMap[k] || 0 })))
+    : keys.map((k) => ({ label: dayLabel(k), minutes: dayMap[k] || 0 }));
+  const max = Math.max(...bars.map((b) => b.minutes), 1);
+  const chart = document.createElement('div');
+  chart.className = 'trend-bars';
+  for (const b of bars) {
+    const col = document.createElement('div');
+    col.className = 'trend-col';
+    col.title = `${b.label}: ${fmtDur(b.minutes)}`;
+    const fill = document.createElement('span');
+    fill.className = 'trend-fill';
+    fill.style.height = `${(b.minutes / max) * 100}%`;
+    col.appendChild(fill);
+    chart.appendChild(col);
+  }
+  el.appendChild(chart);
+}
 function renderSplit(rep) {}
 function renderTotals(rep) {}
 
