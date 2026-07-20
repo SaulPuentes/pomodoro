@@ -136,7 +136,49 @@ function renderTrend(rep) {
   }
   el.appendChild(chart);
 }
-function renderSplit(rep) {}
+function renderSplit(rep) {
+  const el = $('split');
+  el.innerHTML = '';
+  // Cap at PALETTE length so hues never cycle (dataviz non-negotiable):
+  // top 7 projects by time + an aggregated "Other" for the rest.
+  const MAX_SLICES = report.PALETTE.length; // 8
+  const slices = rep.projects.length > MAX_SLICES
+    ? [...rep.projects.slice(0, MAX_SLICES - 1),
+       { name: 'Other', minutes: rep.projects.slice(MAX_SLICES - 1).reduce((s, p) => s + p.minutes, 0) }]
+    : rep.projects;
+  const gradient = report.donutGradient(slices, report.PALETTE);
+  if (!gradient) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = 'No focus time in this range.';
+    el.appendChild(p);
+    return;
+  }
+  const donut = document.createElement('div');
+  donut.className = 'donut';
+  donut.style.background = gradient;
+
+  const legend = document.createElement('ul');
+  legend.className = 'legend';
+  slices.forEach((p, i) => {
+    const pct = Math.round((p.minutes / rep.total) * 100);
+    const li = document.createElement('li');
+    li.className = 'legend-item';
+    const dot = document.createElement('span');
+    dot.className = 'legend-dot';
+    dot.style.background = report.PALETTE[i % report.PALETTE.length];
+    const name = document.createElement('span');
+    name.className = 'legend-name';
+    name.textContent = p.name;
+    const val = document.createElement('span');
+    val.className = 'legend-val';
+    val.textContent = `${pct}% · ${fmtDur(p.minutes)}`;
+    li.append(dot, name, val);
+    legend.appendChild(li);
+  });
+
+  el.append(donut, legend);
+}
 function renderTotals(rep) {}
 
 /* ---- Events ---- */
