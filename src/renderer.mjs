@@ -3,6 +3,7 @@ import * as storage from './storage.mjs';
 import * as bg from './backgrounds.mjs';
 import { playBeep } from './sound.mjs';
 import * as session from './session.mjs';
+import * as report from './report.mjs';
 
 const store = window.localStorage;
 let settings = storage.loadSettings(store);
@@ -26,6 +27,14 @@ function fmt(ms) {
   const m = String(Math.floor(total / 60)).padStart(2, '0');
   const s = String(total % 60).padStart(2, '0');
   return `${m}:${s}`;
+}
+
+function fmtDur(min) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h && m) return `${h}h ${m}m`;
+  if (h) return `${h}h`;
+  return `${m}m`;
 }
 
 /* ---- Background ---- */
@@ -149,6 +158,7 @@ function onComplete() {
   }
   beginWorkSession();
   if (settings.soundEnabled) playBeep();
+  if (!$('drawer-reports').hidden) renderReportsDrawer();
   render();
 }
 
@@ -269,6 +279,69 @@ $('fetchUnsplash').addEventListener('click', async () => {
   }
 });
 
+/* ---- Reports drawer (last 7 days glance) ---- */
+function drawerTile(value, label) {
+  const el = document.createElement('div');
+  el.className = 'tile';
+  const v = document.createElement('span');
+  v.className = 'tile-value';
+  v.textContent = value;
+  const l = document.createElement('span');
+  l.className = 'tile-label';
+  l.textContent = label;
+  el.append(v, l);
+  return el;
+}
+
+function renderReportsDrawer() {
+  const log = storage.loadTimelog(store);
+  const { fromKey, toKey } = report.presetRange('7d', new Date());
+  const rep = report.rangeReport(log, fromKey, toKey);
+
+  const daySet = new Set(rep.days.map((d) => d.date));
+  const streak = report.streakEndingAt(daySet, storage.todayKey());
+
+  const tiles = $('drawerTiles');
+  tiles.innerHTML = '';
+  tiles.append(
+    drawerTile(fmtDur(rep.total), 'this week'),
+    drawerTile(`${streak}d`, 'streak'),
+  );
+
+  const totals = $('drawerTotals');
+  totals.innerHTML = '';
+  if (rep.projects.length === 0) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = 'No focus time this week.';
+    totals.appendChild(p);
+    return;
+  }
+  const top = rep.projects.slice(0, 3);
+  const max = Math.max(...top.map((p) => p.minutes), 1);
+  for (const proj of top) {
+    const row = document.createElement('div');
+    row.className = 'total-row';
+    const head = document.createElement('div');
+    head.className = 'total-head total-head--static';
+    const name = document.createElement('span');
+    name.className = 'total-name';
+    name.textContent = proj.name;
+    const track = document.createElement('span');
+    track.className = 'total-track';
+    const fill = document.createElement('span');
+    fill.className = 'total-fill';
+    fill.style.width = `${(proj.minutes / max) * 100}%`;
+    track.appendChild(fill);
+    const val = document.createElement('span');
+    val.className = 'total-val';
+    val.textContent = fmtDur(proj.minutes);
+    head.append(name, track, val);
+    row.appendChild(head);
+    totals.appendChild(row);
+  }
+}
+
 /* ---- Drawers ---- */
 let openDrawer = null;
 function showDrawer(name) {
@@ -276,6 +349,7 @@ function showDrawer(name) {
   const el = $(`drawer-${name}`);
   if (!el) return;
   if (name === 'projects') renderProjectList();
+  if (name === 'reports') renderReportsDrawer();
   el.hidden = false;
   $('backdrop').hidden = false;
   openDrawer = el;
@@ -289,7 +363,10 @@ function closeDrawer() {
 document.querySelectorAll('[data-drawer]').forEach((b) => {
   b.addEventListener('click', () => showDrawer(b.dataset.drawer));
 });
-$('reportsBtn').addEventListener('click', () => window.pomodoro?.openReports?.());
+$('openReports').addEventListener('click', () => {
+  window.pomodoro?.openReports?.();
+  closeDrawer();
+});
 document.querySelectorAll('[data-close]').forEach((b) => {
   b.addEventListener('click', closeDrawer);
 });
