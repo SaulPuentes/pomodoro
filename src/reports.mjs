@@ -4,6 +4,7 @@ import * as bg from './backgrounds.mjs';
 
 const store = window.localStorage;
 const $ = (id) => document.getElementById(id);
+const OTHER_COLOR = 'rgba(244, 247, 244, 0.28)'; // aggregate, not a category
 
 /* ---- Formatting ---- */
 function fmtDur(min) {
@@ -164,14 +165,18 @@ function renderTrend(rep) {
 function renderSplit(rep) {
   const el = $('split');
   el.innerHTML = '';
-  // Cap at PALETTE length so hues never cycle (dataviz non-negotiable):
-  // top 7 projects by time + an aggregated "Other" for the rest.
-  const MAX_SLICES = report.PALETTE.length; // 8
-  const slices = rep.projects.length > MAX_SLICES
-    ? [...rep.projects.slice(0, MAX_SLICES - 1),
-       { name: 'Other', minutes: rep.projects.slice(MAX_SLICES - 1).reduce((s, p) => s + p.minutes, 0) }]
+  // Top 7 real projects keep their palette hue; everything else folds into a
+  // neutral-gray "Other" so an aggregate never masquerades as a category.
+  const TOP = 7;
+  const hasOther = rep.projects.length > TOP;
+  const slices = hasOther
+    ? [...rep.projects.slice(0, TOP),
+       { name: 'Other', minutes: rep.projects.slice(TOP).reduce((s, p) => s + p.minutes, 0) }]
     : rep.projects;
-  const gradient = report.donutGradient(slices, report.PALETTE);
+  const colors = hasOther
+    ? [...report.PALETTE.slice(0, TOP), OTHER_COLOR]
+    : report.PALETTE;
+  const gradient = report.donutGradient(slices, colors);
   if (!gradient) {
     const p = document.createElement('p');
     p.className = 'empty';
@@ -191,7 +196,7 @@ function renderSplit(rep) {
     li.className = 'legend-item';
     const dot = document.createElement('span');
     dot.className = 'legend-dot';
-    dot.style.background = report.PALETTE[i % report.PALETTE.length];
+    dot.style.background = colors[i % colors.length];
     const name = document.createElement('span');
     name.className = 'legend-name';
     name.textContent = p.name;
