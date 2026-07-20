@@ -139,3 +139,19 @@ test('toWeekly: groups days into ISO-week buckets, ascending', () => {
     { label: 'Jun 29 – Jul 5', minutes: 20 },
   ]);
 });
+
+test('donutGradient: cumulative conic stops per project', () => {
+  const g = report.donutGradient(
+    [{ name: 'A', minutes: 75 }, { name: 'B', minutes: 25 }],
+    ['#111', '#222']);
+  assert.equal(g, 'conic-gradient(#111 0.00deg 270.00deg, #222 270.00deg 360.00deg)');
+});
+
+test('donutGradient: null when there is no time', () => {
+  assert.equal(report.donutGradient([{ name: 'A', minutes: 0 }], ['#111']), null);
+});
+
+test('PALETTE: has at least 8 distinct colors', () => {
+  assert.ok(report.PALETTE.length >= 8);
+  assert.equal(new Set(report.PALETTE).size, report.PALETTE.length);
+});

@@ -166,3 +166,24 @@ export function toWeekly(daily) {
     .sort((a, b) => (a[0] < b[0] ? -1 : 1))
     .map(([wk, minutes]) => ({ label: weekLabel(wk), minutes }));
 }
+
+// Categorical palette for the project-split donut: dataviz reference theme,
+// dark steps, CVD-safe slot order. Validated — do not reorder or edit hex values.
+export const PALETTE = [
+  '#3987e5', '#008300', '#d55181', '#c98500',
+  '#199e70', '#d95926', '#9085e9', '#e66767',
+];
+
+export function donutGradient(projects, colors) {
+  const total = projects.reduce((s, p) => s + p.minutes, 0);
+  if (total === 0) return null;
+  let acc = 0;
+  const stops = projects.map((p, i) => {
+    const start = (acc / total) * 360;
+    acc += p.minutes;
+    const end = (acc / total) * 360;
+    const c = colors[i % colors.length];
+    return `${c} ${start.toFixed(2)}deg ${end.toFixed(2)}deg`;
+  });
+  return `conic-gradient(${stops.join(', ')})`;
+}
