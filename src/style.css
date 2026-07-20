@@ -699,6 +699,7 @@ body {
   cursor: pointer;
   text-align: left;
 }
+.total-head--static { cursor: default; }
 .total-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .total-track {
   height: 8px;
