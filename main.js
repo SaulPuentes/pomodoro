@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, nativeImage } = require('electron');
 const path = require('path');
 
 let win = null;
+let reportsWin = null;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -17,6 +18,29 @@ function createWindow() {
     },
   });
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
+}
+
+function createReportsWindow() {
+  if (reportsWin && !reportsWin.isDestroyed()) {
+    reportsWin.show();
+    reportsWin.focus();
+    return;
+  }
+  reportsWin = new BrowserWindow({
+    width: 940,
+    height: 700,
+    minWidth: 620,
+    minHeight: 520,
+    backgroundColor: '#0c1410',
+    title: 'Reports',
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+  reportsWin.loadFile(path.join(__dirname, 'src', 'reports.html'));
+  reportsWin.on('closed', () => { reportsWin = null; });
 }
 
 app.whenReady().then(() => {
@@ -46,3 +70,5 @@ ipcMain.on('session-ended', () => {
     if (win) win.setAlwaysOnTop(false);
   }, 1000);
 });
+
+ipcMain.on('open-reports', () => createReportsWindow());
