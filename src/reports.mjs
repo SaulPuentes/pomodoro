@@ -71,7 +71,39 @@ function render() {
 }
 
 /* ---- Panels (filled in later tasks) ---- */
-function renderTiles(rep) {}
+function tile(value, label) {
+  const el = document.createElement('div');
+  el.className = 'tile';
+  const v = document.createElement('span');
+  v.className = 'tile-value';
+  v.textContent = value;
+  const l = document.createElement('span');
+  l.className = 'tile-label';
+  l.textContent = label;
+  el.append(v, l);
+  return el;
+}
+
+function renderTiles(rep) {
+  const el = $('tiles');
+  el.innerHTML = '';
+  const calendarDays = report.eachDayKey(state.fromKey, state.toKey).length || 1;
+  const avg = Math.round(rep.total / calendarDays);
+  const daySet = new Set(rep.days.map((d) => d.date));
+  const todayKey = storage.todayKey();
+  const streakEnd = state.toKey < todayKey ? state.toKey : todayKey;
+  const streak = report.streakEndingAt(daySet, streakEnd);
+  const best = rep.bestDay
+    ? `${fmtDur(rep.bestDay.minutes)}`
+    : '—';
+  const bestSub = rep.bestDay ? dayLabel(rep.bestDay.date) : 'best day';
+  el.append(
+    tile(fmtDur(rep.total), 'total focus'),
+    tile(fmtDur(avg), 'daily avg'),
+    tile(`${streak}d`, 'current streak'),
+    tile(best, bestSub),
+  );
+}
 function renderTrend(rep) {}
 function renderSplit(rep) {}
 function renderTotals(rep) {}
