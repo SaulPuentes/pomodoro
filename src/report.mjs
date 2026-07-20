@@ -103,7 +103,7 @@ export function rangeReport(log, fromKey, toKey) {
       for (const [task, mins] of Object.entries(byTask)) {
         p.minutes += mins;
         p.tasks[task] = (p.tasks[task] || 0) + mins;
-        if (task) dayMin[date] = (dayMin[date] || 0) + mins;
+        dayMin[date] = (dayMin[date] || 0) + mins;
       }
     }
   }

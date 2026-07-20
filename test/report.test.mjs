@@ -72,11 +72,11 @@ test('rangeReport: rolls tasks into projects within range, sorted desc', () => {
     ['nav', 25],
   ]);
   assert.deepEqual(r.days, [
-    { date: '2026-06-22', minutes: 75 },
+    { date: '2026-06-22', minutes: 100 }, // Website 75 + Emails 25 (blank task counts)
     { date: '2026-06-24', minutes: 25 },
   ]);
   assert.equal(r.activeDays, 2);
-  assert.deepEqual(r.bestDay, { date: '2026-06-22', minutes: 75 });
+  assert.deepEqual(r.bestDay, { date: '2026-06-22', minutes: 100 });
 });
 
 test('rangeReport: excludes days outside the range', () => {
