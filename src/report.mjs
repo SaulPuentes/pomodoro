@@ -7,6 +7,13 @@ function parseDate(key) {
   return new Date(y, m - 1, d);
 }
 
+function fmtKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 // ISO-8601 week: weeks start Monday; week-year is defined by the Thursday.
 function isoParts(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -84,4 +91,45 @@ export function thisWeek(timelog, now = new Date()) {
     total: wk.total,
     projects: wk.projects.map(({ name, minutes }) => ({ name, minutes })),
   };
+}
+
+export function rangeReport(log, fromKey, toKey) {
+  const acc = {};      // proj -> { minutes, tasks: { task: minutes } }
+  const dayMin = {};   // dateKey -> minutes
+  for (const [date, byProject] of Object.entries(log)) {
+    if (date < fromKey || date > toKey) continue;
+    for (const [proj, byTask] of Object.entries(byProject)) {
+      const p = acc[proj] || (acc[proj] = { minutes: 0, tasks: {} });
+      for (const [task, mins] of Object.entries(byTask)) {
+        p.minutes += mins;
+        p.tasks[task] = (p.tasks[task] || 0) + mins;
+        if (task) dayMin[date] = (dayMin[date] || 0) + mins;
+      }
+    }
+  }
+  const projects = Object.entries(acc)
+    .map(([name, p]) => ({
+      name,
+      minutes: p.minutes,
+      tasks: Object.entries(p.tasks)
+        .map(([tn, tm]) => ({ name: tn, minutes: tm }))
+        .sort((a, b) => b.minutes - a.minutes),
+    }))
+    .sort((a, b) => b.minutes - a.minutes);
+  const total = projects.reduce((s, p) => s + p.minutes, 0);
+  const days = Object.entries(dayMin)
+    .map(([date, minutes]) => ({ date, minutes }))
+    .sort((a, b) => (a.date < b.date ? -1 : 1));
+  const bestDay = days.reduce((best, d) => (!best || d.minutes > best.minutes ? d : best), null);
+  return { total, days, projects, activeDays: days.length, bestDay };
+}
+
+export function streakEndingAt(daySet, endKey) {
+  let n = 0;
+  let d = parseDate(endKey);
+  while (daySet.has(fmtKey(d))) {
+    n++;
+    d.setDate(d.getDate() - 1);
+  }
+  return n;
 }
