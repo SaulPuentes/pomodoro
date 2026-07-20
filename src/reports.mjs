@@ -179,7 +179,61 @@ function renderSplit(rep) {
 
   el.append(donut, legend);
 }
-function renderTotals(rep) {}
+function renderTotals(rep) {
+  const el = $('totals');
+  el.innerHTML = '';
+  if (rep.projects.length === 0) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = 'No projects logged in this range.';
+    el.appendChild(p);
+    return;
+  }
+  const max = Math.max(...rep.projects.map((p) => p.minutes), 1);
+  for (const proj of rep.projects) {
+    const row = document.createElement('div');
+    row.className = 'total-row';
+
+    const head = document.createElement('button');
+    head.className = 'total-head';
+    head.setAttribute('aria-expanded', 'false');
+    const label = document.createElement('span');
+    label.className = 'total-name';
+    label.textContent = proj.name;
+    const track = document.createElement('span');
+    track.className = 'total-track';
+    const fill = document.createElement('span');
+    fill.className = 'total-fill';
+    fill.style.width = `${(proj.minutes / max) * 100}%`;
+    track.appendChild(fill);
+    const val = document.createElement('span');
+    val.className = 'total-val';
+    val.textContent = fmtDur(proj.minutes);
+    head.append(label, track, val);
+
+    const body = document.createElement('div');
+    body.className = 'total-tasks';
+    body.hidden = true;
+    for (const t of proj.tasks) {
+      const tr = document.createElement('div');
+      tr.className = 'total-task';
+      const tn = document.createElement('span');
+      tn.textContent = `· ${t.name || '(untitled)'}`;
+      const tm = document.createElement('span');
+      tm.textContent = fmtDur(t.minutes);
+      tr.append(tn, tm);
+      body.appendChild(tr);
+    }
+
+    head.addEventListener('click', () => {
+      const open = body.hidden;
+      body.hidden = !open;
+      head.setAttribute('aria-expanded', String(open));
+    });
+    row.append(head, body);
+    el.appendChild(row);
+  }
+}
 
 /* ---- Events ---- */
 $('chips').addEventListener('click', (e) => {

@@ -31,35 +31,6 @@ const LOG = {
   '2026-06-15': { Website: { landing: 100 } }, // previous week
 };
 
-test('weekOf: rolls tasks into projects, sorted desc', () => {
-  const wk = report.weekOf(LOG, '2026-W26');
-  assert.equal(wk.total, 125);
-  assert.deepEqual(wk.projects.map((p) => [p.name, p.minutes]), [
-    ['Website', 100],
-    ['Emails', 25],
-  ]);
-  assert.deepEqual(wk.projects[0].tasks.map((t) => [t.name, t.minutes]), [
-    ['landing', 75],
-    ['nav', 25],
-  ]);
-});
-
-test('weeks: keys present, newest first', () => {
-  assert.deepEqual(report.weeks(LOG), ['2026-W26', '2026-W25']);
-});
-
-test('thisWeek: only the current week, project totals only', () => {
-  const tw = report.thisWeek(LOG, new Date(2026, 5, 24));
-  assert.equal(tw.total, 125);
-  assert.deepEqual(tw.projects.map((p) => p.name), ['Website', 'Emails']);
-  assert.equal('tasks' in tw.projects[0], false);
-});
-
-test('empty timelog: weekOf and weeks return empty shapes', () => {
-  assert.deepEqual(report.weekOf({}, '2026-W26'), { total: 0, projects: [] });
-  assert.deepEqual(report.weeks({}), []);
-});
-
 test('rangeReport: rolls tasks into projects within range, sorted desc', () => {
   const r = report.rangeReport(LOG, '2026-06-22', '2026-06-24');
   assert.equal(r.total, 125);

@@ -54,45 +54,6 @@ export function weekLabel(weekKey) {
   return `${start} – ${end}`;
 }
 
-export function weeks(timelog) {
-  const set = new Set();
-  for (const key of Object.keys(timelog)) set.add(isoWeekKey(parseDate(key)));
-  return [...set].sort().reverse(); // 'YYYY-Www' sorts chronologically
-}
-
-export function weekOf(timelog, weekKey) {
-  const acc = {}; // name -> { minutes, tasks: { task: minutes } }
-  for (const [date, byProject] of Object.entries(timelog)) {
-    if (isoWeekKey(parseDate(date)) !== weekKey) continue;
-    for (const [proj, byTask] of Object.entries(byProject)) {
-      const p = acc[proj] || (acc[proj] = { minutes: 0, tasks: {} });
-      for (const [task, mins] of Object.entries(byTask)) {
-        p.minutes += mins;
-        p.tasks[task] = (p.tasks[task] || 0) + mins;
-      }
-    }
-  }
-  const projects = Object.entries(acc)
-    .map(([name, p]) => ({
-      name,
-      minutes: p.minutes,
-      tasks: Object.entries(p.tasks)
-        .map(([tn, tm]) => ({ name: tn, minutes: tm }))
-        .sort((a, b) => b.minutes - a.minutes),
-    }))
-    .sort((a, b) => b.minutes - a.minutes);
-  const total = projects.reduce((s, p) => s + p.minutes, 0);
-  return { total, projects };
-}
-
-export function thisWeek(timelog, now = new Date()) {
-  const wk = weekOf(timelog, isoWeekKey(now));
-  return {
-    total: wk.total,
-    projects: wk.projects.map(({ name, minutes }) => ({ name, minutes })),
-  };
-}
-
 export function rangeReport(log, fromKey, toKey) {
   const acc = {};      // proj -> { minutes, tasks: { task: minutes } }
   const dayMin = {};   // dateKey -> minutes
