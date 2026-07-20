@@ -18,10 +18,12 @@ function createWindow() {
     },
   });
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
+  win.on('closed', () => { win = null; });
 }
 
 function createReportsWindow() {
   if (reportsWin && !reportsWin.isDestroyed()) {
+    if (reportsWin.isMinimized()) reportsWin.restore();
     reportsWin.show();
     reportsWin.focus();
     return;
@@ -52,7 +54,8 @@ app.whenReady().then(() => {
   }
   createWindow();
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (!win || win.isDestroyed()) createWindow();
+    else { win.show(); win.focus(); }
   });
 });
 

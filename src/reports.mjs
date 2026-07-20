@@ -33,8 +33,27 @@ function applyBackground() {
   img.src = cur.url;
 }
 
+const RETENTION_DAYS = storage.TIMELOG_MAX_DAYS;
+
+// Oldest date the timelog still retains (today minus retention window).
+function retentionFloorKey() {
+  const d = new Date();
+  d.setDate(d.getDate() - (RETENTION_DAYS - 1));
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function clampKey(k) {
+  const lo = retentionFloorKey();
+  const hi = storage.todayKey();
+  return k < lo ? lo : (k > hi ? hi : k);
+}
+
 /* ---- Range state ---- */
 let state = { preset: '30d', fromKey: null, toKey: null };
+const expandedProjects = new Set();
 
 function earliestKey(log) {
   const keys = Object.keys(log).sort();
@@ -51,11 +70,17 @@ function applyPreset(preset, log) {
 function syncControls() {
   $('fromDate').value = state.fromKey;
   $('toDate').value = state.toKey;
+  const floor = retentionFloorKey();
+  const today = storage.todayKey();
+  $('fromDate').min = floor; $('fromDate').max = today;
+  $('toDate').min = floor;   $('toDate').max = today;
   document.querySelectorAll('.chip').forEach((c) => {
-    c.classList.toggle('is-on', c.dataset.preset === state.preset);
+    const on = c.dataset.preset === state.preset;
+    c.classList.toggle('is-on', on);
+    c.setAttribute('aria-pressed', String(on));
   });
   $('rangeSpan').textContent =
-    `${dayLabel(state.fromKey)} – ${dayLabel(state.toKey)} · up to 180 days kept`;
+    `${dayLabel(state.fromKey)} – ${dayLabel(state.toKey)} · up to ${RETENTION_DAYS} days kept`;
 }
 
 /* ---- Render ---- */
@@ -64,7 +89,7 @@ function render() {
   if (!state.fromKey) applyPreset(state.preset, log);
   syncControls();
   const rep = report.rangeReport(log, state.fromKey, state.toKey);
-  renderTiles(rep);
+  renderTiles(rep, log);
   renderTrend(rep);
   renderSplit(rep);
   renderTotals(rep);
@@ -84,12 +109,12 @@ function tile(value, label) {
   return el;
 }
 
-function renderTiles(rep) {
+function renderTiles(rep, log) {
   const el = $('tiles');
   el.innerHTML = '';
   const calendarDays = report.eachDayKey(state.fromKey, state.toKey).length || 1;
   const avg = Math.round(rep.total / calendarDays);
-  const daySet = new Set(rep.days.map((d) => d.date));
+  const daySet = new Set(Object.keys(log)); // every retained timelog day has >0 minutes
   const todayKey = storage.todayKey();
   const streakEnd = state.toKey < todayKey ? state.toKey : todayKey;
   const streak = report.streakEndingAt(daySet, streakEnd);
@@ -190,7 +215,7 @@ function renderTotals(rep) {
     return;
   }
   const max = Math.max(...rep.projects.map((p) => p.minutes), 1);
-  for (const proj of rep.projects) {
+  rep.projects.forEach((proj, i) => {
     const row = document.createElement('div');
     row.className = 'total-row';
 
@@ -213,7 +238,11 @@ function renderTotals(rep) {
 
     const body = document.createElement('div');
     body.className = 'total-tasks';
-    body.hidden = true;
+    const isOpen = expandedProjects.has(proj.name);
+    body.hidden = !isOpen;
+    head.setAttribute('aria-expanded', String(isOpen));
+    head.setAttribute('aria-controls', `tasks-${i}`);
+    body.id = `tasks-${i}`;
     for (const t of proj.tasks) {
       const tr = document.createElement('div');
       tr.className = 'total-task';
@@ -229,10 +258,11 @@ function renderTotals(rep) {
       const open = body.hidden;
       body.hidden = !open;
       head.setAttribute('aria-expanded', String(open));
+      if (open) expandedProjects.add(proj.name); else expandedProjects.delete(proj.name);
     });
     row.append(head, body);
     el.appendChild(row);
-  }
+  });
 }
 
 /* ---- Events ---- */
@@ -244,11 +274,13 @@ $('chips').addEventListener('click', (e) => {
 });
 
 function onDateChange() {
-  const from = $('fromDate').value;
-  const to = $('toDate').value;
+  let from = $('fromDate').value;
+  let to = $('toDate').value;
   if (!from || !to) return;
-  state.preset = '';                       // custom range: no active chip
-  state.fromKey = from <= to ? from : to;  // tolerate reversed input
+  from = clampKey(from);
+  to = clampKey(to);
+  state.preset = '';
+  state.fromKey = from <= to ? from : to;
   state.toKey = from <= to ? to : from;
   render();
 }
@@ -257,7 +289,11 @@ $('toDate').addEventListener('change', onDateChange);
 
 // Live refresh: the timer window's logFocus write fires a storage event here;
 // window focus is a belt-and-suspenders fallback.
-window.addEventListener('storage', render);
+window.addEventListener('storage', (e) => {
+  // e.key is null on a full clear(); react only to the data or background keys
+  if (e.key === null || e.key === storage.TIMELOG_KEY) render();
+  else if (e.key === storage.BACKGROUND_KEY) applyBackground();
+});
 window.addEventListener('focus', render);
 
 /* ---- Boot ---- */

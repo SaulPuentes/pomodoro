@@ -1,13 +1,13 @@
 const SETTINGS_KEY = 'pomodoro.settings';
 const HISTORY_KEY = 'pomodoro.history';
-const BACKGROUND_KEY = 'pomodoro.background';
+export const BACKGROUND_KEY = 'pomodoro.background';
 const UNSPLASH_KEY = 'pomodoro.unsplashKey';
 const GOAL_KEY = 'pomodoro.goal';
 const PROJECTS_KEY = 'pomodoro.projects';
 const ACTIVE_KEY = 'pomodoro.active';
-const TIMELOG_KEY = 'pomodoro.timelog';
+export const TIMELOG_KEY = 'pomodoro.timelog';
 const MAX_DAYS = 30;
-const TIMELOG_MAX_DAYS = 180;
+export const TIMELOG_MAX_DAYS = 180;
 
 export const DEFAULT_SETTINGS = {
   workMin: 25, shortMin: 5, longMin: 15, soundEnabled: false, dailyResetEnabled: true,

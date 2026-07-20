@@ -544,6 +544,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  user-select: text;
 }
 .rpt-head { display: flex; flex-direction: column; gap: 12px; }
 .rpt-title {
