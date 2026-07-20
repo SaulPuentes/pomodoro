@@ -103,3 +103,39 @@ test('streakEndingAt: zero when endKey has no focus', () => {
   const set = new Set(['2026-06-22']);
   assert.equal(report.streakEndingAt(set, '2026-06-24'), 0);
 });
+
+test('presetRange: 7d is a 7-day inclusive window ending today', () => {
+  assert.deepEqual(report.presetRange('7d', new Date(2026, 6, 20)),
+    { fromKey: '2026-07-14', toKey: '2026-07-20' });
+});
+
+test('presetRange: 30d window', () => {
+  assert.deepEqual(report.presetRange('30d', new Date(2026, 6, 20)),
+    { fromKey: '2026-06-21', toKey: '2026-07-20' });
+});
+
+test('presetRange: all uses earliestKey', () => {
+  assert.deepEqual(report.presetRange('all', new Date(2026, 6, 20), '2026-01-15'),
+    { fromKey: '2026-01-15', toKey: '2026-07-20' });
+});
+
+test('eachDayKey: inclusive ascending day span', () => {
+  assert.deepEqual(report.eachDayKey('2026-06-29', '2026-07-02'),
+    ['2026-06-29', '2026-06-30', '2026-07-01', '2026-07-02']);
+});
+
+test('eachDayKey: empty when from is after to', () => {
+  assert.deepEqual(report.eachDayKey('2026-07-02', '2026-07-01'), []);
+});
+
+test('toWeekly: groups days into ISO-week buckets, ascending', () => {
+  const daily = [
+    { key: '2026-06-22', minutes: 60 }, // W26 (Mon)
+    { key: '2026-06-24', minutes: 30 }, // W26
+    { key: '2026-06-29', minutes: 20 }, // W27 (Mon)
+  ];
+  assert.deepEqual(report.toWeekly(daily), [
+    { label: 'Jun 22 – 28', minutes: 90 },
+    { label: 'Jun 29 – Jul 5', minutes: 20 },
+  ]);
+});

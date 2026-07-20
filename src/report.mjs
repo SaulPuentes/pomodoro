@@ -133,3 +133,36 @@ export function streakEndingAt(daySet, endKey) {
   }
   return n;
 }
+
+const PRESET_DAYS = { '7d': 7, '30d': 30, '90d': 90 };
+
+export function presetRange(preset, today = new Date(), earliestKey = null) {
+  const toKey = fmtKey(today);
+  if (preset === 'all') return { fromKey: earliestKey || toKey, toKey };
+  const n = PRESET_DAYS[preset] || 30;
+  const from = new Date(today);
+  from.setDate(from.getDate() - (n - 1)); // inclusive window of n days
+  return { fromKey: fmtKey(from), toKey };
+}
+
+export function eachDayKey(fromKey, toKey) {
+  const out = [];
+  const end = parseDate(toKey);
+  let d = parseDate(fromKey);
+  while (d <= end) {
+    out.push(fmtKey(d));
+    d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+  }
+  return out;
+}
+
+export function toWeekly(daily) {
+  const map = new Map(); // weekKey -> minutes
+  for (const { key, minutes } of daily) {
+    const wk = isoWeekKey(parseDate(key));
+    map.set(wk, (map.get(wk) || 0) + minutes);
+  }
+  return [...map.entries()]
+    .sort((a, b) => (a[0] < b[0] ? -1 : 1))
+    .map(([wk, minutes]) => ({ label: weekLabel(wk), minutes }));
+}
