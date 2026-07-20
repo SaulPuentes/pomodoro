@@ -298,7 +298,7 @@ function renderReportsDrawer() {
   const { fromKey, toKey } = report.presetRange('7d', new Date());
   const rep = report.rangeReport(log, fromKey, toKey);
 
-  const daySet = new Set(rep.days.map((d) => d.date));
+  const daySet = new Set(Object.keys(log)); // full timelog — streak not capped by the 7d window
   const streak = report.streakEndingAt(daySet, storage.todayKey());
 
   const tiles = $('drawerTiles');
