@@ -128,11 +128,22 @@ export function toWeekly(daily) {
     .map(([wk, minutes]) => ({ label: weekLabel(wk), minutes }));
 }
 
-// Categorical palette for the project-split donut: dataviz reference theme,
-// dark steps, CVD-safe slot order. Validated — do not reorder or edit hex values.
+// Categorical palette for the project-split donut: "dusk botanical", anchored on
+// --sun (slot 0) and --tide (slot 3). Slot ORDER is the CVD-safety mechanism —
+// do NOT reorder or edit hexes. Validated via the dataviz skill on the dark glass
+// surface: contrast all >=3:1; adjacent normal-vision ΔE >=15 (worst 15.5); worst
+// deutan ΔE 7.2 sits in the 6-8 band, legal because the donut legend (name + %) is
+// secondary encoding. The two fixed light anchors miss dataviz's lightness/chroma
+// bands by design (brand colors). Re-run the validator before touching any hex.
 export const PALETTE = [
-  '#3987e5', '#008300', '#d55181', '#c98500',
-  '#199e70', '#d95926', '#9085e9', '#e66767',
+  '#f0b454', // amber  (= --sun, anchor)
+  '#9a7bd4', // iris
+  '#d17a52', // clay
+  '#79cfc8', // tide   (= --tide, anchor)
+  '#c76aa6', // orchid
+  '#5f96cf', // sky
+  '#b6c24f', // moss
+  '#4fa77a', // sage
 ];
 
 export function donutGradient(projects, colors) {
