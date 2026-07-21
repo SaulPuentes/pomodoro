@@ -306,6 +306,7 @@ function renderReportsDrawer() {
   tiles.append(
     drawerTile(fmtDur(rep.total), 'this week'),
     drawerTile(`${streak}d`, 'streak'),
+    drawerTile(fmtDur(Math.round(rep.total / 7)), 'daily avg'),
   );
 
   const totals = $('drawerTotals');
@@ -317,7 +318,7 @@ function renderReportsDrawer() {
     totals.appendChild(p);
     return;
   }
-  const top = rep.projects.slice(0, 3);
+  const top = rep.projects.slice(0, 5);
   const max = Math.max(...top.map((p) => p.minutes), 1);
   for (const proj of top) {
     const row = document.createElement('div');
@@ -335,7 +336,8 @@ function renderReportsDrawer() {
     track.appendChild(fill);
     const val = document.createElement('span');
     val.className = 'total-val';
-    val.textContent = fmtDur(proj.minutes);
+    const pct = Math.round((proj.minutes / rep.total) * 100);
+    val.textContent = `${pct}% · ${fmtDur(proj.minutes)}`;
     head.append(name, track, val);
     row.appendChild(head);
     totals.appendChild(row);

@@ -614,6 +614,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
 }
+#drawerTiles { grid-template-columns: repeat(3, 1fr); }
 .tile {
   background: var(--glass-strong);
   border: 1px solid var(--stroke);
