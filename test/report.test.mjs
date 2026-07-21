@@ -154,3 +154,12 @@ test('PALETTE: has at least 8 distinct colors', () => {
   assert.ok(report.PALETTE.length >= 8);
   assert.equal(new Set(report.PALETTE).size, report.PALETTE.length);
 });
+
+test('rangeReport: per-project bestDay tie-break picks the earliest day', () => {
+  const log = {
+    '2026-06-10': { Deep: { '': 40 } },
+    '2026-06-12': { Deep: { '': 40 } }, // same minutes → earliest day wins
+  };
+  const r = report.rangeReport(log, '2026-06-10', '2026-06-12');
+  assert.deepEqual(r.projects[0].bestDay, { date: '2026-06-10', minutes: 40 });
+});

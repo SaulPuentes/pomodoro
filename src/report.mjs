@@ -71,7 +71,7 @@ export function rangeReport(log, fromKey, toKey) {
   }
   const projects = Object.entries(acc)
     .map(([name, p]) => {
-      const pDays = Object.entries(p.dayMin);
+      const pDays = Object.entries(p.dayMin).sort((a, b) => (a[0] < b[0] ? -1 : 1));
       const activeDays = pDays.length;
       const bestDay = pDays.reduce(
         (best, [date, minutes]) =>

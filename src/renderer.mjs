@@ -306,6 +306,7 @@ function renderReportsDrawer() {
   tiles.append(
     drawerTile(fmtDur(rep.total), 'this week'),
     drawerTile(`${streak}d`, 'streak'),
+    // fixed /7: the drawer always reports the 7d window (presetRange('7d'))
     drawerTile(fmtDur(Math.round(rep.total / 7)), 'daily avg'),
   );
 

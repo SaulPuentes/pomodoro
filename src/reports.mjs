@@ -108,9 +108,11 @@ function tile(value, label, delta = null) {
   l.textContent = label;
   el.append(v, l);
   if (delta != null) {
+    const dir = delta > 0 ? 'is-up' : delta < 0 ? 'is-down' : 'is-flat';
+    const glyph = delta > 0 ? '↑' : delta < 0 ? '↓' : '±';
     const d = document.createElement('span');
-    d.className = `tile-delta ${delta >= 0 ? 'is-up' : 'is-down'}`;
-    d.textContent = `${delta >= 0 ? '↑' : '↓'} ${Math.abs(delta)}% vs prev`;
+    d.className = `tile-delta ${dir}`;
+    d.textContent = `${glyph} ${Math.abs(delta)}% vs prev`;
     el.append(d);
   }
   return el;
