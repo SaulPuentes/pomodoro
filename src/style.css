@@ -717,6 +717,12 @@ body {
 .total-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
 .total-val { color: var(--mist-dim); font-variant-numeric: tabular-nums; }
 .total-tasks { padding: 0 0 8px 4px; }
+.total-stats {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--mist-dim);
+  font-variant-numeric: tabular-nums;
+}
 .total-task {
   display: flex;
   justify-content: space-between;

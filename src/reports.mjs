@@ -268,6 +268,19 @@ function renderTotals(rep) {
     head.setAttribute('aria-expanded', String(isOpen));
     head.setAttribute('aria-controls', `tasks-${i}`);
     body.id = `tasks-${i}`;
+
+    const stats = document.createElement('p');
+    stats.className = 'total-stats';
+    const pct = rep.total ? Math.round((proj.minutes / rep.total) * 100) : 0;
+    const parts = [
+      `${pct}%`,
+      `${proj.activeDays} active ${proj.activeDays === 1 ? 'day' : 'days'}`,
+      `${fmtDur(proj.avgActive)}/active day`,
+    ];
+    if (proj.bestDay) parts.push(`best ${fmtDur(proj.bestDay.minutes)}`);
+    stats.textContent = parts.join(' · ');
+    body.appendChild(stats);
+
     for (const t of proj.tasks) {
       const tr = document.createElement('div');
       tr.className = 'total-task';
