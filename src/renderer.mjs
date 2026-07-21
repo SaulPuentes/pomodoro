@@ -302,6 +302,7 @@ function renderReportsDrawer() {
   tiles.innerHTML = '';
   tiles.append(
     drawerTile(fmtDur(rep.total), 'this week'),
+    drawerTile(String(rep.projects.length), 'active projects'),
     // fixed /7: the drawer always reports the 7d window (presetRange('7d'))
     drawerTile(fmtDur(Math.round(rep.total / 7)), 'daily avg'),
   );
@@ -315,9 +316,8 @@ function renderReportsDrawer() {
     totals.appendChild(p);
     return;
   }
-  const top = rep.projects.slice(0, 5);
-  const max = Math.max(...top.map((p) => p.minutes), 1);
-  for (const proj of top) {
+  const max = Math.max(...rep.projects.map((p) => p.minutes), 1);
+  for (const proj of rep.projects) {
     const row = document.createElement('div');
     row.className = 'total-row';
     const head = document.createElement('div');
