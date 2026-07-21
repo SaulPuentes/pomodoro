@@ -72,21 +72,6 @@ test('rangeReport: per-project activeDays, bestDay, avgActive', () => {
   assert.deepEqual(emails.bestDay, { date: '2026-06-22', minutes: 25 });
 });
 
-test('streakEndingAt: counts consecutive days ending at endKey', () => {
-  const set = new Set(['2026-06-22', '2026-06-23', '2026-06-24']);
-  assert.equal(report.streakEndingAt(set, '2026-06-24'), 3);
-});
-
-test('streakEndingAt: stops at the first gap', () => {
-  const set = new Set(['2026-06-20', '2026-06-23', '2026-06-24']);
-  assert.equal(report.streakEndingAt(set, '2026-06-24'), 2);
-});
-
-test('streakEndingAt: zero when endKey has no focus', () => {
-  const set = new Set(['2026-06-22']);
-  assert.equal(report.streakEndingAt(set, '2026-06-24'), 0);
-});
-
 test('presetRange: 7d is a 7-day inclusive window ending today', () => {
   assert.deepEqual(report.presetRange('7d', new Date(2026, 6, 20)),
     { fromKey: '2026-07-14', toKey: '2026-07-20' });

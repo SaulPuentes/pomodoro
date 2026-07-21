@@ -123,10 +123,6 @@ function renderTiles(rep, log) {
   el.innerHTML = '';
   const calendarDays = report.eachDayKey(state.fromKey, state.toKey).length || 1;
   const avg = Math.round(rep.total / calendarDays);
-  const daySet = new Set(Object.keys(log)); // every retained timelog day has >0 minutes
-  const todayKey = storage.todayKey();
-  const streakEnd = state.toKey < todayKey ? state.toKey : todayKey;
-  const streak = report.streakEndingAt(daySet, streakEnd);
   const best = rep.bestDay ? `${fmtDur(rep.bestDay.minutes)}` : '—';
   const bestSub = rep.bestDay ? dayLabel(rep.bestDay.date) : 'best day';
 
@@ -147,7 +143,6 @@ function renderTiles(rep, log) {
   el.append(
     tile(fmtDur(rep.total), 'total focus', dTotal),
     tile(fmtDur(avg), 'daily avg'),
-    tile(`${streak}d`, 'current streak'),
     tile(best, bestSub, dBest),
     tile(`${rep.activeDays}/${calendarDays}`, 'active days', dActive),
   );

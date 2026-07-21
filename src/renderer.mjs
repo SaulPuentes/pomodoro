@@ -298,14 +298,10 @@ function renderReportsDrawer() {
   const { fromKey, toKey } = report.presetRange('7d', new Date());
   const rep = report.rangeReport(log, fromKey, toKey);
 
-  const daySet = new Set(Object.keys(log)); // full timelog — streak not capped by the 7d window
-  const streak = report.streakEndingAt(daySet, storage.todayKey());
-
   const tiles = $('drawerTiles');
   tiles.innerHTML = '';
   tiles.append(
     drawerTile(fmtDur(rep.total), 'this week'),
-    drawerTile(`${streak}d`, 'streak'),
     // fixed /7: the drawer always reports the 7d window (presetRange('7d'))
     drawerTile(fmtDur(Math.round(rep.total / 7)), 'daily avg'),
   );

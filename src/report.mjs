@@ -97,16 +97,6 @@ export function rangeReport(log, fromKey, toKey) {
   return { total, days, projects, activeDays: days.length, bestDay };
 }
 
-export function streakEndingAt(daySet, endKey) {
-  let n = 0;
-  let d = parseDate(endKey);
-  while (daySet.has(fmtKey(d))) {
-    n++;
-    d.setDate(d.getDate() - 1);
-  }
-  return n;
-}
-
 const PRESET_DAYS = { '7d': 7, '30d': 30, '90d': 90 };
 
 export function presetRange(preset, today = new Date(), earliestKey = null) {
