@@ -690,6 +690,8 @@ body {
 .legend-name { color: var(--mist); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .legend-val { color: var(--mist-dim); font-variant-numeric: tabular-nums; }
 
+#drawerTotals { max-height: 200px; overflow-y: auto; padding-right: 4px; }
+
 .total-row { border-bottom: 1px solid rgba(244, 247, 244, 0.08); }
 .total-row:last-child { border-bottom: none; }
 .total-head {
