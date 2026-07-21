@@ -55,27 +55,39 @@ export function weekLabel(weekKey) {
 }
 
 export function rangeReport(log, fromKey, toKey) {
-  const acc = {};      // proj -> { minutes, tasks: { task: minutes } }
+  const acc = {};      // proj -> { minutes, tasks: {task: min}, dayMin: {date: min} }
   const dayMin = {};   // dateKey -> minutes
   for (const [date, byProject] of Object.entries(log)) {
     if (date < fromKey || date > toKey) continue;
     for (const [proj, byTask] of Object.entries(byProject)) {
-      const p = acc[proj] || (acc[proj] = { minutes: 0, tasks: {} });
+      const p = acc[proj] || (acc[proj] = { minutes: 0, tasks: {}, dayMin: {} });
       for (const [task, mins] of Object.entries(byTask)) {
         p.minutes += mins;
         p.tasks[task] = (p.tasks[task] || 0) + mins;
+        p.dayMin[date] = (p.dayMin[date] || 0) + mins;
         dayMin[date] = (dayMin[date] || 0) + mins;
       }
     }
   }
   const projects = Object.entries(acc)
-    .map(([name, p]) => ({
-      name,
-      minutes: p.minutes,
-      tasks: Object.entries(p.tasks)
-        .map(([tn, tm]) => ({ name: tn, minutes: tm }))
-        .sort((a, b) => b.minutes - a.minutes),
-    }))
+    .map(([name, p]) => {
+      const pDays = Object.entries(p.dayMin);
+      const activeDays = pDays.length;
+      const bestDay = pDays.reduce(
+        (best, [date, minutes]) =>
+          (!best || minutes > best.minutes ? { date, minutes } : best),
+        null);
+      return {
+        name,
+        minutes: p.minutes,
+        activeDays,
+        avgActive: activeDays ? Math.round(p.minutes / activeDays) : 0,
+        bestDay,
+        tasks: Object.entries(p.tasks)
+          .map(([tn, tm]) => ({ name: tn, minutes: tm }))
+          .sort((a, b) => b.minutes - a.minutes),
+      };
+    })
     .sort((a, b) => b.minutes - a.minutes);
   const total = projects.reduce((s, p) => s + p.minutes, 0);
   const days = Object.entries(dayMin)

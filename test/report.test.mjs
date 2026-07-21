@@ -60,6 +60,18 @@ test('rangeReport: empty when no days match', () => {
     { total: 0, days: [], projects: [], activeDays: 0, bestDay: null });
 });
 
+test('rangeReport: per-project activeDays, bestDay, avgActive', () => {
+  const r = report.rangeReport(LOG, '2026-06-22', '2026-06-24');
+  const web = r.projects.find((p) => p.name === 'Website');
+  assert.equal(web.activeDays, 2); // 06-22 (75m) + 06-24 (25m)
+  assert.deepEqual(web.bestDay, { date: '2026-06-22', minutes: 75 });
+  assert.equal(web.avgActive, 50); // round(100 / 2)
+  const emails = r.projects.find((p) => p.name === 'Emails');
+  assert.equal(emails.activeDays, 1);
+  assert.equal(emails.avgActive, 25);
+  assert.deepEqual(emails.bestDay, { date: '2026-06-22', minutes: 25 });
+});
+
 test('streakEndingAt: counts consecutive days ending at endKey', () => {
   const set = new Set(['2026-06-22', '2026-06-23', '2026-06-24']);
   assert.equal(report.streakEndingAt(set, '2026-06-24'), 3);
