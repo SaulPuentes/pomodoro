@@ -614,7 +614,19 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
 }
-#drawerTiles { grid-template-columns: repeat(3, 1fr); }
+#drawerTiles { grid-template-columns: repeat(2, 1fr); }
+.drawer-section {
+  margin: 26px 0 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--mist-dim);
+  font-weight: 600;
+}
+.drawer-section-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
 .tile {
   background: var(--glass-strong);
   border: 1px solid var(--stroke);

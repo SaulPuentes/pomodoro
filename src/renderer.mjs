@@ -302,10 +302,13 @@ function renderReportsDrawer() {
   tiles.innerHTML = '';
   tiles.append(
     drawerTile(fmtDur(rep.total), 'this week'),
-    drawerTile(String(rep.projects.length), 'active projects'),
     // fixed /7: the drawer always reports the 7d window (presetRange('7d'))
     drawerTile(fmtDur(Math.round(rep.total / 7)), 'daily avg'),
   );
+
+  const head = $('drawerProjHead');
+  head.hidden = rep.projects.length === 0;
+  $('drawerProjCount').textContent = String(rep.projects.length);
 
   const totals = $('drawerTotals');
   totals.innerHTML = '';
