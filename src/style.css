@@ -635,6 +635,13 @@ body {
   text-transform: lowercase;
   letter-spacing: 0.02em;
 }
+.tile-delta {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--mist-dim);
+}
+.tile-delta.is-up { color: var(--tide); }
+.tile-delta.is-down { color: var(--sun); }
 
 .trend-bars {
   display: flex;

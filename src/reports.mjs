@@ -97,7 +97,7 @@ function render() {
 }
 
 /* ---- Panels (filled in later tasks) ---- */
-function tile(value, label) {
+function tile(value, label, delta = null) {
   const el = document.createElement('div');
   el.className = 'tile';
   const v = document.createElement('span');
@@ -107,6 +107,12 @@ function tile(value, label) {
   l.className = 'tile-label';
   l.textContent = label;
   el.append(v, l);
+  if (delta != null) {
+    const d = document.createElement('span');
+    d.className = `tile-delta ${delta >= 0 ? 'is-up' : 'is-down'}`;
+    d.textContent = `${delta >= 0 ? '↑' : '↓'} ${Math.abs(delta)}% vs prev`;
+    el.append(d);
+  }
   return el;
 }
 
@@ -119,15 +125,29 @@ function renderTiles(rep, log) {
   const todayKey = storage.todayKey();
   const streakEnd = state.toKey < todayKey ? state.toKey : todayKey;
   const streak = report.streakEndingAt(daySet, streakEnd);
-  const best = rep.bestDay
-    ? `${fmtDur(rep.bestDay.minutes)}`
-    : '—';
+  const best = rep.bestDay ? `${fmtDur(rep.bestDay.minutes)}` : '—';
   const bestSub = rep.bestDay ? dayLabel(rep.bestDay.date) : 'best day';
+
+  // Period comparison: equal-length window immediately before this one.
+  // Suppressed for the 'all' preset (no prior window) and when the prior
+  // window is empty (nothing to compare against).
+  let dTotal = null, dBest = null, dActive = null;
+  if (state.preset !== 'all') {
+    const prev = report.previousRange(state.fromKey, state.toKey);
+    const prevRep = report.rangeReport(log, prev.fromKey, prev.toKey);
+    if (prevRep.total > 0) {
+      dTotal = report.pctChange(rep.total, prevRep.total);
+      dBest = report.pctChange(rep.bestDay?.minutes || 0, prevRep.bestDay?.minutes || 0);
+      dActive = report.pctChange(rep.activeDays, prevRep.activeDays);
+    }
+  }
+
   el.append(
-    tile(fmtDur(rep.total), 'total focus'),
+    tile(fmtDur(rep.total), 'total focus', dTotal),
     tile(fmtDur(avg), 'daily avg'),
     tile(`${streak}d`, 'current streak'),
-    tile(best, bestSub),
+    tile(best, bestSub, dBest),
+    tile(`${rep.activeDays}/${calendarDays}`, 'active days', dActive),
   );
 }
 const DAILY_MAX = 45; // beyond this many days, switch to weekly buckets
