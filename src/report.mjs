@@ -129,6 +129,22 @@ export function eachDayKey(fromKey, toKey) {
   return out;
 }
 
+// The equal-length window immediately before [fromKey, toKey].
+export function previousRange(fromKey, toKey) {
+  const len = eachDayKey(fromKey, toKey).length;
+  const end = parseDate(fromKey);
+  end.setDate(end.getDate() - 1);             // day before the current window
+  const start = new Date(end);
+  start.setDate(start.getDate() - (len - 1)); // inclusive window of len days
+  return { fromKey: fmtKey(start), toKey: fmtKey(end) };
+}
+
+// Signed percent change, or null when prev is 0 (undefined change).
+export function pctChange(cur, prev) {
+  if (!prev) return null;
+  return Math.round(((cur - prev) / prev) * 100);
+}
+
 export function toWeekly(daily) {
   const map = new Map(); // weekKey -> minutes
   for (const { key, minutes } of daily) {

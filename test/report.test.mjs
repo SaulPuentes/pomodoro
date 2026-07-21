@@ -134,6 +134,22 @@ test('donutGradient: null when there is no time', () => {
   assert.equal(report.donutGradient([{ name: 'A', minutes: 0 }], ['#111']), null);
 });
 
+test('previousRange: equal-length window ending the day before', () => {
+  assert.deepEqual(report.previousRange('2026-07-14', '2026-07-20'),
+    { fromKey: '2026-07-07', toKey: '2026-07-13' });
+});
+
+test('previousRange: single-day range', () => {
+  assert.deepEqual(report.previousRange('2026-07-20', '2026-07-20'),
+    { fromKey: '2026-07-19', toKey: '2026-07-19' });
+});
+
+test('pctChange: increase, decrease, and null on zero base', () => {
+  assert.equal(report.pctChange(120, 100), 20);
+  assert.equal(report.pctChange(90, 100), -10);
+  assert.equal(report.pctChange(50, 0), null);
+});
+
 test('PALETTE: has at least 8 distinct colors', () => {
   assert.ok(report.PALETTE.length >= 8);
   assert.equal(new Set(report.PALETTE).size, report.PALETTE.length);
