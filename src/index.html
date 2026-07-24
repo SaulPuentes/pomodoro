@@ -79,7 +79,10 @@
       <label class="field"><span>Long break</span><input id="longMin" type="number" min="1" /></label>
       <label class="check"><input id="soundEnabled" type="checkbox" /><span>Chime when a session ends</span></label>
       <label class="check"><input id="dailyResetEnabled" type="checkbox" /><span>Start fresh cycles at 5 am</span></label>
-      <label class="field field-accent"><span>Focus highlight</span><input id="accentColor" type="color" /><button id="accentReset" class="link" type="button">Reset</button></label>
+      <div class="field-accent">
+        <span>Focus highlight</span>
+        <div id="accentSwatches" class="swatches"></div>
+      </div>
       <hr class="rule" />
       <label class="field"><span>Unsplash access key</span><input id="unsplashKey" type="password" placeholder="optional" autocomplete="off" /></label>
       <p class="hint">Add your own key to pull fresh nature photos. Get one free at unsplash.com/developers.</p>

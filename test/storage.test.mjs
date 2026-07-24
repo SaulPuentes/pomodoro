@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as storage from '../src/storage.mjs';
+import * as report from '../src/report.mjs';
 
 function fakeStore() {
   const m = new Map();
@@ -186,4 +187,8 @@ test('deleteProject removes it from the list but keeps history', () => {
   storage.deleteProject(st, 'Website');
   assert.deepEqual(storage.loadProjects(st), []);
   assert.deepEqual(storage.loadTimelog(st)['2026-06-22'], { Website: { landing: 25 } });
+});
+
+test('DEFAULT_ACCENT is the first preset swatch', () => {
+  assert.equal(storage.DEFAULT_ACCENT, report.PALETTE[0]);
 });

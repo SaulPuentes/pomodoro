@@ -406,10 +406,22 @@ body {
 }
 .field input[type='number'] { width: 64px; text-align: center; }
 .field input[type='password'] { width: 140px; }
-.field-accent > span { margin-right: auto; }
-.field-accent input[type='color'] {
-  width: 40px; height: 28px; padding: 2px; cursor: pointer;
+.field-accent { margin: 14px 0 4px; font-size: 14px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px rgba(12, 18, 15, 0.35);
+  cursor: pointer;
+  transition: transform 0.18s var(--ease), border-color 0.2s var(--ease);
 }
+.swatch:hover { transform: translateY(-2px); }
+/* Ring is --mist, not --accent: --accent equals the selected swatch's own
+   color, so an --accent ring would be invisible on the active swatch. */
+.swatch.active { border-color: var(--mist); }
 .check {
   display: flex;
   align-items: center;

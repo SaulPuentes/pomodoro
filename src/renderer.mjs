@@ -221,7 +221,7 @@ function loadSettingsUI() {
   $('soundEnabled').checked = settings.soundEnabled;
   $('dailyResetEnabled').checked = settings.dailyResetEnabled;
   $('unsplashKey').value = storage.loadUnsplashKey(store);
-  $('accentColor').value = settings.accentColor;
+  markActiveSwatch();
   refreshFetchButton();
 }
 
@@ -236,7 +236,7 @@ function onSettingsChange() {
     longMin: clampInt($('longMin').value, settings.longMin),
     soundEnabled: $('soundEnabled').checked,
     dailyResetEnabled: $('dailyResetEnabled').checked,
-    accentColor: $('accentColor').value,
+    accentColor: settings.accentColor,
   };
   storage.saveSettings(store, settings);
   applyAccent();
@@ -248,18 +248,35 @@ function onSettingsChange() {
   render();
 }
 
-['workMin', 'shortMin', 'longMin', 'soundEnabled', 'dailyResetEnabled', 'accentColor'].forEach((id) => {
+['workMin', 'shortMin', 'longMin', 'soundEnabled', 'dailyResetEnabled'].forEach((id) => {
   $(id).addEventListener('change', onSettingsChange);
 });
 
-// Live preview while dragging the picker; onSettingsChange persists on commit.
-$('accentColor').addEventListener('input', () => {
-  document.documentElement.style.setProperty('--sun', $('accentColor').value);
-});
-$('accentReset').addEventListener('click', () => {
-  $('accentColor').value = storage.DEFAULT_ACCENT;
-  onSettingsChange();
-});
+// Focus-highlight presets: the report palette is already CVD-checked on this
+// surface and slot 0 is DEFAULT_ACCENT, so it doubles as the reset swatch.
+function buildSwatches() {
+  const row = $('accentSwatches');
+  for (const hex of report.PALETTE) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'swatch';
+    b.dataset.color = hex;
+    b.style.background = hex;
+    b.setAttribute('aria-label', `Focus highlight ${hex}`);
+    b.title = hex;
+    b.addEventListener('click', () => {
+      settings = { ...settings, accentColor: hex };
+      onSettingsChange();
+    });
+    row.appendChild(b);
+  }
+}
+
+function markActiveSwatch() {
+  document.querySelectorAll('.swatch').forEach((b) => {
+    b.classList.toggle('active', b.dataset.color === settings.accentColor);
+  });
+}
 
 $('unsplashKey').addEventListener('change', () => {
   storage.saveUnsplashKey(store, $('unsplashKey').value.trim());
@@ -578,6 +595,7 @@ $('goal').addEventListener('input', () => {
 applyAccent();
 applyBackground(currentBg, { persist: false });
 buildFilmstrip();
+buildSwatches();
 loadSettingsUI();
 renderProjects();
 render();
