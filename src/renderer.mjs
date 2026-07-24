@@ -230,6 +230,7 @@ function applyAccent() {
 }
 
 function onSettingsChange() {
+  const prev = settings;
   settings = {
     workMin: clampInt($('workMin').value, settings.workMin),
     shortMin: clampInt($('shortMin').value, settings.shortMin),
@@ -241,7 +242,13 @@ function onSettingsChange() {
   storage.saveSettings(store, settings);
   applyAccent();
   loadSettingsUI();
-  if (!state.running) {
+  // Only a duration change invalidates the running clock; colour and chime
+  // toggles must not discard a paused session's tracked segments.
+  const durationsChanged =
+    prev.workMin !== settings.workMin ||
+    prev.shortMin !== settings.shortMin ||
+    prev.longMin !== settings.longMin;
+  if (durationsChanged && !state.running) {
     state = { ...state, remainingMs: timer.durationMsFor(state.phase, settings) };
     beginWorkSession();
   }
@@ -274,7 +281,9 @@ function buildSwatches() {
 
 function markActiveSwatch() {
   document.querySelectorAll('.swatch').forEach((b) => {
-    b.classList.toggle('active', b.dataset.color === settings.accentColor);
+    const on = b.dataset.color === settings.accentColor;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', String(on));
   });
 }
 

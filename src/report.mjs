@@ -153,6 +153,8 @@ export function toWeekly(daily) {
 // deutan ΔE 7.2 sits in the 6-8 band, legal because the donut legend (name + %) is
 // secondary encoding. The two fixed light anchors miss dataviz's lightness/chroma
 // bands by design (brand colors). Re-run the validator before touching any hex.
+// Editing a hex also orphans the stored accentColor of every user sitting on
+// that slot: the colour keeps applying, but its swatch loses the active ring.
 export const PALETTE = [
   '#f0b454', // amber  (= --sun, anchor)
   '#9a7bd4', // iris
