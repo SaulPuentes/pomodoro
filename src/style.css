@@ -630,7 +630,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
 }
-#drawerTiles { grid-template-columns: repeat(2, 1fr); }
+#drawerTiles { grid-template-columns: repeat(3, 1fr); }
 .drawer-section {
   margin: 26px 0 10px;
   font-size: 12px;

@@ -340,10 +340,14 @@ function renderReportsDrawer() {
   const { fromKey, toKey } = report.presetRange('7d', new Date());
   const rep = report.rangeReport(log, fromKey, toKey);
 
+  const todayKey = storage.todayKey();
+  const today = report.rangeReport(log, todayKey, todayKey);
+
   const tiles = $('drawerTiles');
   tiles.innerHTML = '';
   tiles.append(
     drawerTile(fmtDur(rep.total), 'this week'),
+    drawerTile(fmtDur(today.total), 'today'),
     // fixed /7: the drawer always reports the 7d window (presetRange('7d'))
     drawerTile(fmtDur(Math.round(rep.total / 7)), 'daily avg'),
   );
