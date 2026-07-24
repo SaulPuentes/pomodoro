@@ -221,7 +221,12 @@ function loadSettingsUI() {
   $('soundEnabled').checked = settings.soundEnabled;
   $('dailyResetEnabled').checked = settings.dailyResetEnabled;
   $('unsplashKey').value = storage.loadUnsplashKey(store);
+  $('accentColor').value = settings.accentColor;
   refreshFetchButton();
+}
+
+function applyAccent() {
+  document.documentElement.style.setProperty('--sun', settings.accentColor);
 }
 
 function onSettingsChange() {
@@ -231,8 +236,10 @@ function onSettingsChange() {
     longMin: clampInt($('longMin').value, settings.longMin),
     soundEnabled: $('soundEnabled').checked,
     dailyResetEnabled: $('dailyResetEnabled').checked,
+    accentColor: $('accentColor').value,
   };
   storage.saveSettings(store, settings);
+  applyAccent();
   loadSettingsUI();
   if (!state.running) {
     state = { ...state, remainingMs: timer.durationMsFor(state.phase, settings) };
@@ -241,8 +248,17 @@ function onSettingsChange() {
   render();
 }
 
-['workMin', 'shortMin', 'longMin', 'soundEnabled', 'dailyResetEnabled'].forEach((id) => {
+['workMin', 'shortMin', 'longMin', 'soundEnabled', 'dailyResetEnabled', 'accentColor'].forEach((id) => {
   $(id).addEventListener('change', onSettingsChange);
+});
+
+// Live preview while dragging the picker; onSettingsChange persists on commit.
+$('accentColor').addEventListener('input', () => {
+  document.documentElement.style.setProperty('--sun', $('accentColor').value);
+});
+$('accentReset').addEventListener('click', () => {
+  $('accentColor').value = storage.DEFAULT_ACCENT;
+  onSettingsChange();
 });
 
 $('unsplashKey').addEventListener('change', () => {
@@ -559,6 +575,7 @@ $('goal').addEventListener('input', () => {
 });
 
 /* ---- Boot ---- */
+applyAccent();
 applyBackground(currentBg, { persist: false });
 buildFilmstrip();
 loadSettingsUI();

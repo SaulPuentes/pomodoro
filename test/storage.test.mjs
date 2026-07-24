@@ -13,12 +13,25 @@ function fakeStore() {
 test('loadSettings returns defaults on empty store', () => {
   assert.deepEqual(storage.loadSettings(fakeStore()), {
     workMin: 25, shortMin: 5, longMin: 15, soundEnabled: false, dailyResetEnabled: true,
+    accentColor: '#f0b454',
   });
+});
+
+test('loadSettings round-trips a custom accentColor', () => {
+  const st = fakeStore();
+  storage.saveSettings(st, { ...storage.DEFAULT_SETTINGS, accentColor: '#79cfc8' });
+  assert.equal(storage.loadSettings(st).accentColor, '#79cfc8');
+});
+
+test('loadSettings fills accentColor default for older stored settings', () => {
+  const st = fakeStore();
+  st.setItem('pomodoro.settings', JSON.stringify({ workMin: 40 }));
+  assert.equal(storage.loadSettings(st).accentColor, '#f0b454');
 });
 
 test('save then load round-trips settings', () => {
   const st = fakeStore();
-  const custom = { workMin: 50, shortMin: 10, longMin: 30, soundEnabled: true, dailyResetEnabled: false };
+  const custom = { workMin: 50, shortMin: 10, longMin: 30, soundEnabled: true, dailyResetEnabled: false, accentColor: '#abcdef' };
   storage.saveSettings(st, custom);
   assert.deepEqual(storage.loadSettings(st), custom);
 });

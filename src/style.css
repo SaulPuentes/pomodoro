@@ -406,6 +406,10 @@ body {
 }
 .field input[type='number'] { width: 64px; text-align: center; }
 .field input[type='password'] { width: 140px; }
+.field-accent > span { margin-right: auto; }
+.field-accent input[type='color'] {
+  width: 40px; height: 28px; padding: 2px; cursor: pointer;
+}
 .check {
   display: flex;
   align-items: center;

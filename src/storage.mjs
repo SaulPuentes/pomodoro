@@ -9,8 +9,11 @@ export const TIMELOG_KEY = 'pomodoro.timelog';
 const MAX_DAYS = 30;
 export const TIMELOG_MAX_DAYS = 180;
 
+export const DEFAULT_ACCENT = '#f0b454'; // amber (= --sun)
+
 export const DEFAULT_SETTINGS = {
   workMin: 25, shortMin: 5, longMin: 15, soundEnabled: false, dailyResetEnabled: true,
+  accentColor: DEFAULT_ACCENT,
 };
 
 export const RESET_HOUR = 5;

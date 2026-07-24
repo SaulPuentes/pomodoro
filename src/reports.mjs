@@ -332,5 +332,7 @@ window.addEventListener('storage', (e) => {
 window.addEventListener('focus', render);
 
 /* ---- Boot ---- */
+// Mirror the timer window's custom focus accent (chart palette stays fixed).
+document.documentElement.style.setProperty('--sun', storage.loadSettings(store).accentColor);
 applyBackground();
 render();
