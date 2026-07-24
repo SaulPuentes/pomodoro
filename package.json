@@ -4,10 +4,12 @@
   "description": "Desktop Pomodoro timer",
   "main": "main.js",
   "scripts": {
+    "postinstall": "codesign --force --deep --sign - node_modules/electron/dist/Electron.app",
     "start": "electron .",
     "test": "node --test test/",
     "icon": "bash scripts/make-icon.sh",
-    "dist": "electron-builder"
+    "dist": "electron-builder && codesign --force --deep --sign - 'dist/mac-arm64/Pomodoro.app' && codesign --verify --deep --strict 'dist/mac-arm64/Pomodoro.app'",
+    "open": "open 'dist/mac-arm64/Pomodoro.app'"
   },
   "build": {
     "appId": "com.saulpuentes.pomodoro",

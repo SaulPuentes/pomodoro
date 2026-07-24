@@ -720,14 +720,26 @@ body {
 
 #drawerTotals { max-height: 200px; overflow-y: auto; padding-right: 4px; }
 
+/* One grid for the whole list; rows share its columns via subgrid so the
+   value column is as wide as the widest duration and every track lines up. */
+.totals, #drawerTotals {
+  display: grid;
+  grid-template-columns: minmax(90px, 1.4fr) 3fr auto;
+  column-gap: 12px;
+}
+.totals > .empty, #drawerTotals > .empty { grid-column: 1 / -1; }
 .total-row { border-bottom: 1px solid rgba(244, 247, 244, 0.08); }
 .total-row:last-child { border-bottom: none; }
+.totals > .total-row, #drawerTotals > .total-row,
+.total-row > .total-head, .total-row > .total-tasks {
+  grid-column: 1 / -1;
+}
+.total-row { display: grid; grid-template-columns: subgrid; }
 .total-head {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(90px, 1.4fr) 3fr auto;
+  grid-template-columns: subgrid;
   align-items: center;
-  gap: 12px;
   padding: 9px 0;
   background: none;
   border: none;
@@ -746,7 +758,7 @@ body {
   overflow: hidden;
 }
 .total-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
-.total-val { color: var(--mist-dim); font-variant-numeric: tabular-nums; }
+.total-val { color: var(--mist-dim); font-variant-numeric: tabular-nums; text-align: right; }
 .total-tasks { padding: 0 0 8px 4px; }
 .total-stats {
   margin: 0 0 6px;
